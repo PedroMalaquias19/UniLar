@@ -1,10 +1,10 @@
 package com.pedro.UniLar.profile.user;
 
-import achama.website.awss3.file.FileService;
-import achama.website.exception.BadRequestException;
-import achama.website.exception.NotAllowedException;
-import achama.website.exception.NotFoundException;
-import achama.website.exception.UniqueKeyViolationException;
+import com.pedro.UniLar.awss3.file.FileService;
+import com.pedro.UniLar.exception.BadRequestException;
+import com.pedro.UniLar.exception.NotAllowedException;
+import com.pedro.UniLar.exception.NotFoundException;
+import com.pedro.UniLar.exception.UniqueKeyViolationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -96,13 +96,13 @@ public class UserService {
     public void uploadUserProfileImage(Long id, MultipartFile file) {
         User user = findById(id);
         String imageUrl = fileService.uploadImage("profile", id, file);
-        user.setProfileImageUrl(imageUrl);
+        user.setFotografia(imageUrl);
         userRepository.save(user);
     }
 
 
     public byte[] downloadUserProfileImage(Long id) {
         User user = findById(id);
-        return fileService.downloadImage(user.getProfileImageUrl().orElse(null));
+        return fileService.downloadImage(user.getFotografia().orElse(null));
     }
 }

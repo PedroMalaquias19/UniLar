@@ -1,0 +1,8 @@
+### Login como admin (HTTP request)
+POST http://localhost:8081/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "javahater000@gmail.com",
+  "password": "admin"
+}

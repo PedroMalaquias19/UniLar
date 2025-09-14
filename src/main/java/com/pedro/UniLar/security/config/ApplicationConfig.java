@@ -1,6 +1,6 @@
 package com.pedro.UniLar.security.config;
 
-import achama.website.profile.user.UserService;
+import com.pedro.UniLar.profile.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

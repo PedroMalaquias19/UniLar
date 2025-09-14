@@ -1,7 +1,7 @@
 package com.pedro.UniLar.security.config;
 
-import achama.website.profile.token.TokenRepository;
 import com.google.common.base.Strings;
+import com.pedro.UniLar.profile.token.TokenRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

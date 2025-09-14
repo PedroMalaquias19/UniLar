@@ -1,6 +1,6 @@
 package com.pedro.UniLar.profile.emailconfirmation;
 
-import achama.website.exception.NotFoundException;
+import com.pedro.UniLar.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

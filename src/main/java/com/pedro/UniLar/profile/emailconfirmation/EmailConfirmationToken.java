@@ -1,6 +1,6 @@
 package com.pedro.UniLar.profile.emailconfirmation;
 
-import achama.website.profile.user.User;
+import com.pedro.UniLar.profile.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

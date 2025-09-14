@@ -1,8 +1,8 @@
 package com.pedro.UniLar.profile.user;
 
-import achama.website.profile.emailconfirmation.EmailConfirmationToken;
-import achama.website.profile.token.Token;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.pedro.UniLar.profile.emailconfirmation.EmailConfirmationToken;
+import com.pedro.UniLar.profile.token.Token;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -28,27 +28,25 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue
     @Column(updatable = false)
-    private Long id;
+    private Long id_usuario;
 
     @Column(nullable = false)
-    private String firstName;
+    private String nome;
 
-    @Column(nullable = false)
-    private String lastName;
+    private String sobrenome;
 
     @Column(nullable = false, unique = true)
     @Email
-    @NotBlank(message = "field can not be empty")
+    @NotBlank(message = "O email é obrigatório")
     private String email;
 
     @Column(nullable = false)
-    @NotBlank(message = "field can not be empty")
+    @NotBlank(message = "A password é obrigatória")
     private String password;
 
-    private String address;
-    private String contact;
+    private String telefone;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String NIF;
 
     @Column(nullable = false)
@@ -60,7 +58,7 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    private String profileImageUrl;
+    private String fotografia;
 
     @OneToMany(
             mappedBy = "user",
@@ -113,7 +111,7 @@ public class User implements UserDetails {
         return password;
     }
 
-    public Optional<String> getProfileImageUrl() {
-        return Optional.ofNullable(profileImageUrl);
+    public Optional<String> getFotografia() {
+        return Optional.ofNullable(fotografia);
     }
 }

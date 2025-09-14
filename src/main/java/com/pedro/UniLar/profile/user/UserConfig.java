@@ -7,7 +7,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static achama.website.profile.user.Role.*;
+import static com.pedro.UniLar.profile.user.Role.ADMIN;
+
 
 @Configuration
 @RequiredArgsConstructor
@@ -25,12 +26,11 @@ public class UserConfig {
 
             if(existingUser == null){
                 var user = User.builder()
-                        .firstName("Admin")
-                        .lastName("Admin")
+                        .nome("Admin")
+                        .sobrenome("Admin")
                         .email("javahater000@gmail.com")
-                        .contact(null)
-                        .address(null)
-                        .NIF(null)
+                        .telefone(null)
+                        .NIF("008283849213232")
                         .password(passwordEncoder.encode("admin"))
                         .enabled(true)
                         .nonLocked(true)

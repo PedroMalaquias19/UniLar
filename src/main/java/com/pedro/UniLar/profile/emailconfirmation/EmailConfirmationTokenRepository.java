@@ -1,6 +1,5 @@
 package com.pedro.UniLar.profile.emailconfirmation;
 
-import achama.website.profile.emailconfirmation.EmailConfirmationToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

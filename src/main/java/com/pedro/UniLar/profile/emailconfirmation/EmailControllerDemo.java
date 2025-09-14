@@ -1,27 +1,23 @@
 package com.pedro.UniLar.profile.emailconfirmation;
 
-import achama.website.security.auth.AuthService;
+// Import removido
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+// Import removido
 
 @Controller
 @RequestMapping("/api/v1/auth/")
 @RequiredArgsConstructor
 public class EmailControllerDemo {
 
-    private final AuthService authenticationService;
+    // authenticationService removido
 
     @GetMapping("emailConfirmed")
-    public String index(){
+    public String index() {
         return "emailConfirmed";
     }
 
-    @GetMapping("confirm/")
-    public String confirmEmail(@RequestParam("token") String token){
-        authenticationService.confirmEmail(token);
-        return "success";
-    }
+    // Endpoint de confirmação removido
 }

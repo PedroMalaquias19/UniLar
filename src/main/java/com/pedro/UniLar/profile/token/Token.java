@@ -1,6 +1,6 @@
 package com.pedro.UniLar.profile.token;
 
-import achama.website.profile.user.User;
+import com.pedro.UniLar.profile.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +19,7 @@ public class Token {
     @GeneratedValue
     private Long id;
 
+    @Column(length = 1024)
     private String token;
 
     private TokenType type;
