@@ -3,10 +3,13 @@ package com.pedro.UniLar.security.auth;
 // Unused imports removed
 import com.pedro.UniLar.profile.token.Token;
 import com.pedro.UniLar.profile.token.TokenRepository;
-import com.pedro.UniLar.profile.user.Role;
-import com.pedro.UniLar.profile.user.User;
+import com.pedro.UniLar.profile.user.enums.Role;
+import com.pedro.UniLar.profile.user.entities.User;
 import com.pedro.UniLar.profile.user.UserService;
 // Unused import removed
+import com.pedro.UniLar.security.auth.dto.AuthRequest;
+import com.pedro.UniLar.security.auth.dto.AuthResponse;
+import com.pedro.UniLar.security.auth.dto.RegisterRequest;
 import com.pedro.UniLar.security.config.JwtService;
 // Unused imports removed
 import lombok.RequiredArgsConstructor;
@@ -85,7 +88,7 @@ public class AuthService {
     }
 
     private void revokeAllUserTokens(User user) {
-        List<Token> allValidTokensByUser = tokenRepository.findAllValidTokensByUser(user.getId_usuario());
+        List<Token> allValidTokensByUser = tokenRepository.findAllValidTokensByUser(user.getIdUsuario());
 
         if (allValidTokensByUser.isEmpty())
             return;

@@ -1,4 +1,4 @@
-package com.pedro.UniLar.security.auth;
+package com.pedro.UniLar.security.auth.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

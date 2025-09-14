@@ -1,8 +1,9 @@
-package com.pedro.UniLar.profile.user;
+package com.pedro.UniLar.profile.user.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pedro.UniLar.profile.emailconfirmation.EmailConfirmationToken;
 import com.pedro.UniLar.profile.token.Token;
+import com.pedro.UniLar.profile.user.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -22,13 +23,14 @@ import java.util.Optional;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "User")
+@Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "_user")
 public class User implements UserDetails {
 
     @Id
     @GeneratedValue
     @Column(updatable = false)
-    private Long id_usuario;
+    private Long idUsuario;
 
     @Column(nullable = false)
     private String nome;
@@ -60,19 +62,11 @@ public class User implements UserDetails {
 
     private String fotografia;
 
-    @OneToMany(
-            mappedBy = "user",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Token> tokens;
 
-    @OneToMany(
-            mappedBy = "user",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<EmailConfirmationToken> confirmationTokens;
 
@@ -107,7 +101,7 @@ public class User implements UserDetails {
     }
 
     @Override
-    public String getPassword(){
+    public String getPassword() {
         return password;
     }
 

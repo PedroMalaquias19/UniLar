@@ -1,5 +1,6 @@
 package com.pedro.UniLar.profile.user;
 
+import com.pedro.UniLar.profile.user.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

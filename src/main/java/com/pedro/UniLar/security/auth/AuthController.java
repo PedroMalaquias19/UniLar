@@ -1,6 +1,9 @@
 package com.pedro.UniLar.security.auth;
 
-import com.pedro.UniLar.profile.user.User;
+import com.pedro.UniLar.profile.user.entities.User;
+import com.pedro.UniLar.security.auth.dto.AuthRequest;
+import com.pedro.UniLar.security.auth.dto.AuthResponse;
+import com.pedro.UniLar.security.auth.dto.RegisterRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

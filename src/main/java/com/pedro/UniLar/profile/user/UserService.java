@@ -5,6 +5,8 @@ import com.pedro.UniLar.exception.BadRequestException;
 import com.pedro.UniLar.exception.NotAllowedException;
 import com.pedro.UniLar.exception.NotFoundException;
 import com.pedro.UniLar.exception.UniqueKeyViolationException;
+import com.pedro.UniLar.profile.user.entities.User;
+import com.pedro.UniLar.profile.user.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

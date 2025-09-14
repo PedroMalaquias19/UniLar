@@ -1,5 +1,7 @@
 package com.pedro.UniLar.profile.user;
 
+import com.pedro.UniLar.profile.user.entities.User;
+import com.pedro.UniLar.profile.user.enums.Role;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;

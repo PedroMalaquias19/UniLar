@@ -1,5 +1,6 @@
 package com.pedro.UniLar.profile.user;
 
+import com.pedro.UniLar.profile.user.entities.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -7,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static com.pedro.UniLar.profile.user.Role.ADMIN;
+import static com.pedro.UniLar.profile.user.enums.Role.ADMIN;
 
 
 @Configuration

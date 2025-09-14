@@ -1,6 +1,6 @@
 package com.pedro.UniLar.profile.token;
 
-import com.pedro.UniLar.profile.user.User;
+import com.pedro.UniLar.profile.user.entities.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
