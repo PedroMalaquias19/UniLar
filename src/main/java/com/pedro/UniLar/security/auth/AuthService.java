@@ -1,27 +1,24 @@
 package com.pedro.UniLar.security.auth;
 
-// Unused imports removed
+import com.pedro.UniLar.profile.user.entities.Admin;
+import com.pedro.UniLar.profile.user.entities.Sindico;
+import com.pedro.UniLar.profile.user.entities.Condomino;
+import com.pedro.UniLar.security.auth.dto.SindicoRegisterRequest;
+import com.pedro.UniLar.security.auth.dto.CondominoRegisterRequest;
 import com.pedro.UniLar.profile.token.Token;
 import com.pedro.UniLar.profile.token.TokenRepository;
 import com.pedro.UniLar.profile.user.enums.Role;
 import com.pedro.UniLar.profile.user.entities.User;
 import com.pedro.UniLar.profile.user.UserService;
-// Unused import removed
 import com.pedro.UniLar.security.auth.dto.AuthRequest;
 import com.pedro.UniLar.security.auth.dto.AuthResponse;
 import com.pedro.UniLar.security.auth.dto.RegisterRequest;
 import com.pedro.UniLar.security.config.JwtService;
-// Unused imports removed
 import lombok.RequiredArgsConstructor;
-// Unused imports removed
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-// Unused imports removed
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-// Unused imports removed
-
-// Unused imports removed
 import java.util.List;
 
 @Service
@@ -38,6 +35,7 @@ public class AuthService {
     // EmailConfig removed
 
     public User register(RegisterRequest request) {
+        // Mantido como registro de usuário padrão (USER)
         var user = User.builder()
                 .nome(request.nome())
                 .sobrenome(request.sobrenome())
@@ -51,6 +49,55 @@ public class AuthService {
                 .build();
 
         return userService.saveUser(user);
+    }
+
+    public Admin registerAdmin(RegisterRequest request) {
+        var admin = new Admin();
+        admin.setNome(request.nome());
+        admin.setSobrenome(request.sobrenome());
+        admin.setEmail(request.email());
+        admin.setPassword(passwordEncoder.encode(request.password()));
+        admin.setNIF(request.NIF());
+        admin.setTelefone(request.telefone());
+        admin.setEnabled(true);
+        admin.setNonLocked(true);
+        admin.setRole(Role.ADMIN);
+        return (Admin) userService.saveUser(admin);
+    }
+
+    public Sindico registerSindico(SindicoRegisterRequest request) {
+        var sindico = new Sindico();
+        sindico.setNome(request.nome());
+        sindico.setSobrenome(request.sobrenome());
+        sindico.setEmail(request.email());
+        sindico.setPassword(passwordEncoder.encode(request.password()));
+        sindico.setNIF(request.NIF());
+        sindico.setTelefone(request.telefone());
+        sindico.setEnabled(true);
+        sindico.setNonLocked(true);
+        sindico.setRole(Role.SINDICO);
+        sindico.setInicioMandato(request.inicioMandato());
+        sindico.setFimMandato(request.fimMandato());
+        sindico.setContrato(request.contrato());
+        return (Sindico) userService.saveUser(sindico);
+    }
+
+    public Condomino registerCondomino(CondominoRegisterRequest request) {
+        var condomino = new Condomino();
+        condomino.setNome(request.nome());
+        condomino.setSobrenome(request.sobrenome());
+        condomino.setEmail(request.email());
+        condomino.setPassword(passwordEncoder.encode(request.password()));
+        condomino.setNIF(request.NIF());
+        condomino.setTelefone(request.telefone());
+        condomino.setEnabled(true);
+        condomino.setNonLocked(true);
+        condomino.setRole(Role.CONDOMINO);
+        condomino.setDataDeEntrada(request.dataDeEntrada());
+        condomino.setDataDeSaida(request.dataDeSaida());
+        condomino.setContrato(request.contrato());
+        condomino.setTipo(request.tipo());
+        return (Condomino) userService.saveUser(condomino);
     }
 
     // Email confirmation disabled for simplicity

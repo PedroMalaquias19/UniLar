@@ -1,12 +1,110 @@
-### Register new user
-POST http://localhost:8081/api/v1/auth/register
+### =============================================================
+### Variáveis Globais
+### =============================================================
+@base-url = http://localhost:8081
+@admin-email = admin@example.com
+@admin-pass = adminPass
+@sindico-email = maria.sindico@example.com
+@sindico-pass = sindicoPass
+@condomino-email = joao.condomino@example.com
+@condomino-pass = condominoPass
+
+
+### =============================================================
+### 1) Registro de Admin (Público)
+###    Execute uma vez. Se já existir, vai retornar erro de duplicidade.
+### =============================================================
+POST {{base-url}}/api/v1/auth/register/admin
 Content-Type: application/json
 
 {
-  "nome": "Test",
-  "sobrenome": "User",
-  "email": "tsgsfsfe@example.com",
-  "password": "test1234",
-  "NIF": "45617fda8901",
-  "telefone": "999999999"
+  "nome": "Admin",
+  "sobrenome": "Root",
+  "email": "{{admin-email}}",
+  "password": "{{admin-pass}}",
+  "NIF": "ADM001234567",
+  "telefone": "910000000"
 }
+
+### =============================================================
+### 2) Login Admin (captura do token de acesso)
+###    Captura: client.global.set("admin-token", <access_token>)
+### =============================================================
+POST {{base-url}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{admin-email}}",
+  "password": "{{admin-pass}}"
+}
+> {% client.global.set("admin-token", response.body.access_token); %}
+
+
+### =============================================================
+### 3) Registro de Síndico (Requer token ADMIN com sindico:create/admin:create)
+### =============================================================
+
+POST {{base-url}}/api/v1/auth/register/sindico
+Content-Type: application/json
+Authorization: Bearer {{admin-token}}
+
+{
+  "nome": "Maria",
+  "sobrenome": "Silva",
+  "email": "{{sindico-email}}",
+  "password": "{{sindico-pass}}",
+  "NIF": "SIND12345678",
+  "telefone": "911111111",
+  "inicioMandato": "2025-01-01",
+  "fimMandato": "2025-12-31",
+  "contrato": "ContratoSindicoRef001"
+}
+
+
+
+### (Opcional) Login Síndico
+POST {{base-url}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{sindico-email}}",
+  "password": "{{sindico-pass}}"
+}
+> {% client.global.set("sindico-token", response.body.access_token); %}
+
+### =============================================================
+### 4) Registro de Condômino (Requer token ADMIN ou permissão condomino:create)
+### =============================================================
+POST {{base-url}}/api/v1/auth/register/condomino
+Content-Type: application/json
+Authorization: Bearer {{admin-token}}
+
+{
+  "nome": "João",
+  "sobrenome": "Pereira",
+  "email": "{{condomino-email}}",
+  "password": "{{condomino-pass}}",
+  "NIF": "COND98765432",
+  "telefone": "922222222",
+  "dataDeEntrada": "2025-09-14",
+  "dataDeSaida": null,
+  "contrato": "ContratoCondominoRef900",
+  "tipo": "PROPRIETARIO"
+}
+
+### (Opcional) Login Condômino
+POST {{base-url}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{condomino-email}}",
+  "password": "{{condomino-pass}}"
+}
+> {% client.global.set("condomino-token", response.body.access_token); %}
+
+### =============================================================
+### 6) Referência Rápida de Tokens Salvos
+### =============================================================
+# {{admin-token}}
+# {{sindico-token}}
+# {{condomino-token}}

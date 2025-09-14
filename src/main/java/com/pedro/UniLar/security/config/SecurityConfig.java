@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -22,6 +23,7 @@ import static org.springframework.http.HttpMethod.*;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -35,8 +37,15 @@ public class SecurityConfig {
                                 .csrf(AbstractHttpConfigurer::disable)
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                                 .authorizeHttpRequests(auth -> auth
-                                                .requestMatchers("/api/v1/auth/**").permitAll()
-                                                .anyRequest().permitAll())
+                                                .requestMatchers("/api/v1/auth/login", "/api/v1/auth/register/admin")
+                                                .permitAll()
+                                                .requestMatchers("/api/v1/auth/register/sindico")
+                                                .hasAnyAuthority("sindico:create", "admin:create", "ROLE_ADMIN")
+                                                .requestMatchers("/api/v1/auth/register/condomino")
+                                                .hasAnyAuthority("condomino:create", "admin:create", "ROLE_ADMIN")
+                                                .requestMatchers("/api/v1/auth/register").permitAll() // registro básico
+                                                                                                      // usuário comum
+                                                .anyRequest().authenticated())
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .authenticationProvider(authenticationProvider)
