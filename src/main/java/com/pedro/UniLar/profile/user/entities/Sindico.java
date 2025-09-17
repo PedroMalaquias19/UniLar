@@ -1,22 +1,32 @@
 package com.pedro.UniLar.profile.user.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.pedro.UniLar.condominio.mandato.Mandato;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "sindicos")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class Sindico extends User {
 
-    @Column(nullable = false)
-    private LocalDate inicioMandato;
+    @OneToMany(mappedBy = "sindico", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Mandato> mandatos = new ArrayList<>();
 
-    private LocalDate fimMandato;
+    public void adicionarMandato(Mandato mandato) {
+        mandato.setSindico(this);
+        this.mandatos.add(mandato);
+    }
 
-    private String contrato;
+    public void removerMandato(Mandato mandato) {
+        this.mandatos.remove(mandato);
+        mandato.setSindico(null);
+    }
 }
