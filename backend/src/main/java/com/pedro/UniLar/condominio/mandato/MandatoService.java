@@ -91,7 +91,7 @@ public class MandatoService {
     }
 
     private void validarMandatoAtivo(Long condominioId) {
-        if (repository.existsByCondominio_IdAndStatus(condominioId, StatusContrato.ATIVO)) {
+        if (repository.existsByCondominio_IdCondominioAndStatus(condominioId, StatusContrato.ATIVO)) {
             throw new NotAllowedException("Já existe um mandato ativo neste condomínio");
         }
     }

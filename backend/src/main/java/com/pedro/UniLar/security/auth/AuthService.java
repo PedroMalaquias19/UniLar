@@ -76,9 +76,6 @@ public class AuthService {
         sindico.setEnabled(true);
         sindico.setNonLocked(true);
         sindico.setRole(Role.SINDICO);
-        sindico.setInicioMandato(request.inicioMandato());
-        sindico.setFimMandato(request.fimMandato());
-        sindico.setContrato(request.contrato());
         return (Sindico) userService.saveUser(sindico);
     }
 

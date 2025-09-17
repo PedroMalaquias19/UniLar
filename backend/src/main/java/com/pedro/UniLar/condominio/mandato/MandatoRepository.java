@@ -8,8 +8,8 @@ import java.util.Optional;
 
 public interface MandatoRepository extends JpaRepository<Mandato, Long> {
 
-    @Query("select m from Mandato m where m.condominio.id = :condominioId and m.status = 'ATIVO'")
+    @Query("select m from Mandato m where m.condominio.idCondominio = :condominioId and m.status = 'ATIVO'")
     Optional<Mandato> findMandatoAtivo(Long condominioId);
 
-    boolean existsByCondominio_IdAndStatus(Long condominioId, StatusContrato status);
+    boolean existsByCondominio_IdCondominioAndStatus(Long condominioId, StatusContrato status);
 }

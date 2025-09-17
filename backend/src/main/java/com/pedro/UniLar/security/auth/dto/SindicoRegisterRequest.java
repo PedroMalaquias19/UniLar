@@ -8,8 +8,6 @@ public record SindicoRegisterRequest(
         String email,
         String password,
         String NIF,
-        String telefone,
-        LocalDate inicioMandato,
-        LocalDate fimMandato,
-        String contrato) {
+        String telefone
+) {
 }
