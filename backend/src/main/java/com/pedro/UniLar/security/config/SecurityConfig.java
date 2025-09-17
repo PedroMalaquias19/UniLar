@@ -37,7 +37,19 @@ public class SecurityConfig {
                                 .csrf(AbstractHttpConfigurer::disable)
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                                 .authorizeHttpRequests(auth -> auth
-                                                .requestMatchers("/api/v1/auth/login", "/api/v1/auth/register/admin")
+                                                .requestMatchers(
+                                                        "/api/v1/auth/login",
+                                                        "/api/v1/auth/register/admin",
+                                                        "/v3/api-docs",
+                                                        "/v3/api-docs/**",
+                                                        "/swagger-resources",
+                                                        "/swagger-resources/**",
+                                                        "/configuration/ui",
+                                                        "/configuration/security",
+                                                        "/swagger-ui/**",
+                                                        "/webjars/**",
+                                                        "/swagger-ui.html",
+                                                        "/ws/**")
                                                 .permitAll()
                                                 .requestMatchers("/api/v1/auth/register/sindico")
                                                 .hasAnyAuthority("sindico:create", "admin:create", "ROLE_ADMIN")
