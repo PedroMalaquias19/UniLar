@@ -10,8 +10,5 @@ public record CondominoRegisterRequest(
         String password,
         String NIF,
         String telefone,
-        LocalDate dataDeEntrada,
-        LocalDate dataDeSaida,
-        String contrato,
         TipoCondomino tipo) {
 }

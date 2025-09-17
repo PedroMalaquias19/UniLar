@@ -8,8 +8,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class ContratoPropriedadeMapper {
 
-    public ContratoPropriedade toEntity(ContratoPropriedadeRequest request){
-        if(request == null) return null;
+    public ContratoPropriedade toEntity(ContratoPropriedadeRequest request) {
+        if (request == null)
+            return null;
         return ContratoPropriedade.builder()
                 .inicio(request.inicio())
                 .fim(request.fim())
@@ -18,15 +19,18 @@ public class ContratoPropriedadeMapper {
                 .build();
     }
 
-    public void update(ContratoPropriedade entity, ContratoPropriedadeRequest request){
-        if(request == null) return;
-        if(request.inicio() != null) entity.setInicio(request.inicio());
+    public void update(ContratoPropriedade entity, ContratoPropriedadeRequest request) {
+        if (request == null)
+            return;
+        if (request.inicio() != null)
+            entity.setInicio(request.inicio());
         entity.setFim(request.fim());
         entity.setContratoUrl(request.contratoUrl());
     }
 
-    public ContratoPropriedadeResponse toResponse(ContratoPropriedade entity){
-        if(entity == null) return null;
+    public ContratoPropriedadeResponse toResponse(ContratoPropriedade entity) {
+        if (entity == null)
+            return null;
         return new ContratoPropriedadeResponse(
                 entity.getIdContrato(),
                 entity.getMoradia() != null ? entity.getMoradia().getIdMoradia() : null,
@@ -34,7 +38,6 @@ public class ContratoPropriedadeMapper {
                 entity.getInicio(),
                 entity.getFim(),
                 entity.getStatus(),
-                entity.getContratoUrl()
-        );
+                entity.getContratoUrl());
     }
 }

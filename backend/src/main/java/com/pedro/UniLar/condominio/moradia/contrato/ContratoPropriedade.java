@@ -2,7 +2,7 @@ package com.pedro.UniLar.condominio.moradia.contrato;
 
 import com.pedro.UniLar.condominio.moradia.Moradia;
 import com.pedro.UniLar.condominio.moradia.contrato.enums.StatusContratoPropriedade;
-import com.pedro.UniLar.profile.user.entities.User;
+import com.pedro.UniLar.profile.user.entities.Condomino;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,7 +10,7 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "contratos_propriedade", uniqueConstraints = {
-        @UniqueConstraint(name = "uk_contrato_ativo_moradia", columnNames = {"moradia_id", "status"})
+        @UniqueConstraint(name = "uk_contrato_ativo_moradia", columnNames = { "moradia_id", "status" })
 })
 @Getter
 @Setter
@@ -29,7 +29,7 @@ public class ContratoPropriedade {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "proprietario_id")
-    private User proprietario; // O proprietário vigente
+    private Condomino proprietario; // O proprietário vigente
 
     @Column(nullable = false)
     private LocalDate inicio;
@@ -42,7 +42,7 @@ public class ContratoPropriedade {
 
     private String contratoUrl;
 
-    public boolean ativo(){
+    public boolean ativo() {
         return status == StatusContratoPropriedade.ATIVO;
     }
 }

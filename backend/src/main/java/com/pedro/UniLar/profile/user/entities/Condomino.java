@@ -14,13 +14,6 @@ import java.time.LocalDate;
 @EqualsAndHashCode(callSuper = true)
 public class Condomino extends User {
 
-    @Column(nullable = false)
-    private LocalDate dataDeEntrada;
-
-    private LocalDate dataDeSaida;
-
-    private String contrato;
-
     @Enumerated(EnumType.STRING)
     private TipoCondomino tipo;
 }

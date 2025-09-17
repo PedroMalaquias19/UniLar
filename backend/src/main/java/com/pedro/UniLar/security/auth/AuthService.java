@@ -27,15 +27,11 @@ public class AuthService {
 
     private final UserService userService;
     private final TokenRepository tokenRepository;
-    // Email confirmation disabled
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    // JwtConfig removed (unused)
-    // EmailConfig removed
 
     public User register(RegisterRequest request) {
-        // Mantido como registro de usuário padrão (USER)
         var user = User.builder()
                 .nome(request.nome())
                 .sobrenome(request.sobrenome())
@@ -90,16 +86,9 @@ public class AuthService {
         condomino.setEnabled(true);
         condomino.setNonLocked(true);
         condomino.setRole(Role.CONDOMINO);
-        condomino.setDataDeEntrada(request.dataDeEntrada());
-        condomino.setDataDeSaida(request.dataDeSaida());
-        condomino.setContrato(request.contrato());
         condomino.setTipo(request.tipo());
         return (Condomino) userService.saveUser(condomino);
     }
-
-    // Email confirmation disabled for simplicity
-
-    // Email confirmation endpoint removed for simplicity
 
     public AuthResponse authenticate(AuthRequest request) {
         authenticationManager.authenticate(
