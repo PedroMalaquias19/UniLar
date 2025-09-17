@@ -34,40 +34,40 @@ public class SecurityConfig {
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                 http
-                                .csrf(AbstractHttpConfigurer::disable)
-                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                                .authorizeHttpRequests(auth -> auth
-                                                .requestMatchers(
-                                                        "/api/v1/auth/login",
-                                                        "/api/v1/auth/register/admin",
-                                                        "/v3/api-docs",
-                                                        "/v3/api-docs/**",
-                                                        "/swagger-resources",
-                                                        "/swagger-resources/**",
-                                                        "/configuration/ui",
-                                                        "/configuration/security",
-                                                        "/swagger-ui/**",
-                                                        "/webjars/**",
-                                                        "/swagger-ui.html",
-                                                        "/ws/**")
-                                                .permitAll()
-                                                .requestMatchers("/api/v1/auth/register/sindico")
-                                                .hasAnyAuthority("sindico:create", "admin:create", "ROLE_ADMIN")
-                                                .requestMatchers("/api/v1/auth/register/condomino")
-                                                .hasAnyAuthority("condomino:create", "admin:create", "ROLE_ADMIN")
-                                                .requestMatchers("/api/v1/auth/register").permitAll() // registro básico
-                                                                                                      // usuário comum
-                                                .anyRequest().authenticated())
-                                .sessionManagement(session -> session
-                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                                .authenticationProvider(authenticationProvider)
-                                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                                .logout(logout -> logout
-                                                .logoutUrl("/api/v1/auth/logout")
-                                                .addLogoutHandler(logoutHandler)
-                                                .logoutSuccessHandler((request, response,
-                                                                authentication) -> SecurityContextHolder
-                                                                                .clearContext()));
+                        .csrf(AbstractHttpConfigurer::disable)
+                        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                        .authorizeHttpRequests(auth -> auth
+                                        .requestMatchers(
+                                                "/api/v1/auth/login",
+                                                "/api/v1/auth/register/admin",
+                                                "/v3/api-docs",
+                                                "/v3/api-docs/**",
+                                                "/swagger-resources",
+                                                "/swagger-resources/**",
+                                                "/configuration/ui",
+                                                "/configuration/security",
+                                                "/swagger-ui/**",
+                                                "/webjars/**",
+                                                "/swagger-ui.html",
+                                                "/ws/**")
+                                        .permitAll()
+                                        .requestMatchers("/api/v1/auth/register/sindico")
+                                        .hasAnyAuthority("sindico:create", "admin:create", "ROLE_ADMIN")
+                                        .requestMatchers("/api/v1/auth/register/condomino")
+                                        .hasAnyAuthority("condomino:create", "admin:create", "ROLE_ADMIN")
+                                        .requestMatchers("/api/v1/auth/register").permitAll() // registro básico
+                                                                                              // usuário comum
+                                        .anyRequest().authenticated())
+                        .sessionManagement(session -> session
+                                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        .authenticationProvider(authenticationProvider)
+                        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                        .logout(logout -> logout
+                                        .logoutUrl("/api/v1/auth/logout")
+                                        .addLogoutHandler(logoutHandler)
+                                        .logoutSuccessHandler((request, response,
+                                                        authentication) -> SecurityContextHolder
+                                                                        .clearContext()));
                 return http.build();
         }
 
