@@ -107,7 +107,8 @@ public class ContratoPropriedadeService {
         if (authentication == null || !(authentication.getPrincipal() instanceof User user)) {
             throw new NotAllowedException("Autenticação necessária");
         }
-        if (user.getRole() == Role.ADMIN) return;
+        if (user.getRole() == Role.ADMIN)
+            return;
         if (user.getRole() == Role.SINDICO) {
             Sindico sindico = (Sindico) user;
             var mandatoOpt = mandatoRepository.findMandatoAtivo(moradia.getBloco().getCondominio().getIdCondominio());
@@ -116,7 +117,8 @@ public class ContratoPropriedadeService {
             }
             return;
         }
-        throw new NotAllowedException("Apenas administradores ou síndicos com mandato ativo podem executar esta operação");
+        throw new NotAllowedException(
+                "Apenas administradores ou síndicos com mandato ativo podem executar esta operação");
     }
 
     private void validarDatas(LocalDate inicio, LocalDate fim) {
