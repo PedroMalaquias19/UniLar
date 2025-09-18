@@ -43,6 +43,10 @@ public class Condominio {
 
     private Integer toleranciaDias;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer diaCobranca = 1;
+
     @OneToMany(mappedBy = "condominio", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Bloco> blocos = new ArrayList<>();

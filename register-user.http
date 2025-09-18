@@ -8,6 +8,7 @@
 @sindico-pass = sindicoPass
 @condomino-email = joao.condomino@example.com
 @condomino-pass = condominoPass
+@sindico-id = 1
 
 
 ### =============================================================
@@ -67,7 +68,7 @@ Content-Type: application/json
   "email": "{{sindico-email}}",
   "password": "{{sindico-pass}}"
 }
-> {% client.global.set("sindico-token", response.body.accessToken); %}
+> {% client.global.set("sindico-token", response.body.access_token); %}
 
 ### =============================================================
 ### 4) Registro de Condômino (Requer token ADMIN ou permissão condomino:create)
@@ -102,3 +103,270 @@ Content-Type: application/json
 # {{admin-token}}
 # {{sindico-token}}
 # {{condomino-token}}
+
+
+### Condominio Request
+POST {{base-url}}/api/v1/condominios
+Content-Type: application/json
+Authorization: Bearer {{admin-token}}
+
+{
+  "nome": "Condomínio Solar das Acácias",
+  "descricao": "Um condomínio residencial moderno com várias áreas de lazer, segurança 24h e sistema de gestão digital.",
+  "quota": 25000.00,
+  "juros": 2.50,
+  "toleranciaDias": 5,
+  "diaCobranca": 1
+}
+
+### Condominio Request
+POST {{base-url}}/api/v1/condominios
+Content-Type: application/json
+Authorization: Bearer {{admin-token}}
+
+{
+  "nome": "Residencial Bela Vista",
+  "descricao": "Condomínio familiar com 5 blocos, jardim comunitário e estacionamento para visitantes.",
+  "quota": 18000.00,
+  "multaFixa": 3000.00,
+  "toleranciaDias": 3,
+  "diaCobranca": 1
+}
+
+
+### Bloco - CRUD
+
+### Criar Bloco (Síndico com mandato ativo no condomínio)
+POST {{base-url}}/api/v1/condominios/1/blocos
+Content-Type: application/json
+Authorization: Bearer {{sindico-token}}
+
+{
+  "nomeBloco": "Bloco A",
+  "numMoradias": 5
+}
+> {% client.global.set("bloco-id-A", response.body.id); %}
+
+### Criar outro Bloco (Admin pode executar se tiver permissão equivalente ao síndico)
+POST {{base-url}}/api/v1/condominios/1/blocos
+Content-Type: application/json
+Authorization: Bearer {{sindico-token}}
+
+{
+  "nomeBloco": "Bloco B",
+  "numMoradias": 8
+}
+> {% client.global.set("bloco-id-B", response.body.id); %}
+
+### Listar Blocos do Condomínio
+GET {{base-url}}/api/v1/condominios/1/blocos
+Authorization: Bearer {{sindico-token}}
+
+### Detalhar Bloco por ID
+GET {{base-url}}/api/v1/condominios/1/blocos/4
+Authorization: Bearer {{sindico-token}}
+
+### Atualizar Bloco
+PUT {{base-url}}/api/v1/condominios/1/blocos/{{bloco-id-A}}
+Content-Type: application/json
+Authorization: Bearer {{sindico-token}}
+
+{
+  "nomeBloco": "Bloco A - Atualizado",
+  "numMoradias": 10
+}
+
+### Remover Bloco
+DELETE {{base-url}}/api/v1/condominios/1/blocos/{{bloco-id-B}}
+Authorization: Bearer {{sindico-token}}
+
+
+### =============================================================
+### 7) Criar Condomínios (com captura de IDs)
+### =============================================================
+
+POST {{base-url}}/api/v1/condominios
+Content-Type: application/json
+Authorization: Bearer {{admin-token}}
+
+{
+  "nome": "Condomínio Jardim do Atlântico",
+  "descricao": "Condomínio residencial com 3 blocos, piscina e parque infantil.",
+  "tipo": "RESIDENCIAL",
+  "quota": 20000.00,
+  "juros": 1.50,
+  "multaFixa": 1500.00,
+  "toleranciaDias": 5,
+  "diaCobranca": 1
+}
+> {% client.global.set("condominio-id-1", response.body.id); %}
+
+###
+POST {{base-url}}/api/v1/condominios
+Content-Type: application/json
+Authorization: Bearer {{admin-token}}
+
+{
+  "nome": "Parque Empresarial Aurora",
+  "descricao": "Condomínio comercial com portaria 24h e estacionamento rotativo.",
+  "tipo": "COMERCIAL",
+  "quota": 45000.00,
+  "juros": 2.00,
+  "multaFixa": 5000.00,
+  "toleranciaDias": 3,
+  "diaCobranca": 1
+}
+> {% client.global.set("condominio-id-2", response.body.id); %}
+
+
+### =============================================================
+### 8) Buscar Condomínios (lista, paginação e por ID)
+### =============================================================
+
+GET {{base-url}}/api/v1/condominios
+Authorization: Bearer {{admin-token}}
+
+###
+
+GET {{base-url}}/api/v1/condominios?page=0&size=10&sort=nome,asc
+Authorization: Bearer {{admin-token}}
+
+###
+
+# Filtrar por nome (ajuste a query conforme sua API)
+GET {{base-url}}/api/v1/condominios?nome=Condom%C3%ADnio
+Authorization: Bearer {{admin-token}}
+
+###
+
+# Detalhar por ID (usar o ID capturado acima)
+GET {{base-url}}/api/v1/condominios/1
+Authorization: Bearer {{admin-token}}
+
+
+### =============================================================
+### 9) Criar Mandato de Síndico para um Condomínio
+### =============================================================
+
+# Se não tiver sido capturado no registro, ajuste o valor manualmente
+# @sindico-id = <coloque-aqui-o-id-do-sindico>
+
+POST {{base-url}}/api/v1/condominios/mandatos
+Content-Type: application/json
+Authorization: Bearer {{admin-token}}
+
+{
+  "sindicoId": 3,
+  "condominioId": 1,
+  "inicioMandato": "2025-01-01",
+  "fimMandato": "2025-12-31",
+  "salario": 1000000.0
+}
+> {% client.global.set("mandato-id-1", response.body.id); %}
+
+### (Opcional) Listar mandatos do condomínio
+GET {{base-url}}/api/v1/condominios/1/mandatos
+Authorization: Bearer {{admin-token}}
+
+
+### =============================================================
+### 10) Criar Blocos para um Condomínio
+### =============================================================
+
+POST {{base-url}}/api/v1/condominios/1/blocos
+Content-Type: application/json
+Authorization: Bearer {{sindico-token}}
+
+{
+  "nomeBloco": "Bloco A",
+  "numMoradias": "Bloco voltado para o jardim"
+}
+> {% client.global.set("bloco-id-A", response.body.id); %}
+
+###
+POST {{base-url}}/api/v1/condominios/{{condominio-id-1}}/blocos
+Content-Type: application/json
+Authorization: Bearer {{admin-token}}
+
+{
+  "nome": "Bloco B",
+  "descricao": "Bloco próximo à portaria"
+}
+> {% client.global.set("bloco-id-B", response.body.id); %}
+
+### (Listar blocos do condomínio)
+GET {{base-url}}/api/v1/condominios/{{condominio-id-1}}/blocos
+Authorization: Bearer {{admin-token}}
+
+
+### =============================================================
+### 11) Criar Moradias em um Bloco
+### =============================================================
+
+POST {{base-url}}/api/v1/condominios/{{condominio-id-1}}/blocos/{{bloco-id-A}}/moradias
+Content-Type: application/json
+Authorization: Bearer {{admin-token}}
+
+{
+  "numero": "Apt 101",
+  "tipologia": "T2",
+  "fracao": "A",
+  "piso": 1,
+  "areaM2": 85.5
+}
+> {% client.global.set("moradia-id-101", response.body.id); %}
+
+###
+POST {{base-url}}/api/v1/condominios/{{condominio-id-1}}/blocos/{{bloco-id-A}}/moradias
+Content-Type: application/json
+Authorization: Bearer {{admin-token}}
+
+{
+  "numero": "Apt 102",
+  "tipologia": "T3",
+  "fracao": "B",
+  "piso": 1,
+  "areaM2": 95.0
+}
+> {% client.global.set("moradia-id-102", response.body.id); %}
+
+### (Listar moradias do bloco)
+GET {{base-url}}/api/v1/condominios/{{condominio-id-1}}/blocos/{{bloco-id-A}}/moradias
+Authorization: Bearer {{admin-token}}
+
+
+### =============================================================
+### 12) Atribuir Condôminos de vários tipos a Moradias
+###      (PROPRIETARIO / INQUILINO)
+### =============================================================
+
+# Ajuste o ID do proprietário caso necessário
+# @proprietario-id = <coloque-aqui-o-id-do-proprietario>
+
+POST {{base-url}}/api/v1/moradias/{{moradia-id-101}}/condominos
+Content-Type: application/json
+Authorization: Bearer {{admin-token}}
+
+{
+  "condominoId": "{{proprietario-id}}",
+  "vinculo": "PROPRIETARIO",
+  "dataInicio": "2025-01-05"
+}
+
+### Vincular um inquilino (se necessário, crie e capture o ID)
+# @inquilino-id = <coloque-aqui-o-id-do-inquilino>
+
+POST {{base-url}}/api/v1/moradias/{{moradia-id-101}}/condominos
+Content-Type: application/json
+Authorization: Bearer {{admin-token}}
+
+{
+  "condominoId": "{{inquilino-id}}",
+  "vinculo": "INQUILINO",
+  "dataInicio": "2025-02-01"
+}
+
+### (Listar vínculos/condôminos de uma moradia)
+GET {{base-url}}/api/v1/moradias/{{moradia-id-101}}/condominos
+Authorization: Bearer {{admin-token}}
+

@@ -38,7 +38,7 @@ public class MandatoMapper {
                 entity.getInicioMandato(),
                 entity.getFimMandato(),
                 entity.getSalario(),
-                entity.getStatus(),
+                entity.getStatusContrato(),
                 entity.getContratoUrl());
     }
 }

@@ -5,6 +5,7 @@ import com.pedro.UniLar.condominio.bloco.dto.BlocoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,18 +29,19 @@ public class BlocoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BlocoResponse> find(@PathVariable Long id) {
-        return ResponseEntity.ok(service.findById(id));
+    public ResponseEntity<BlocoResponse> find(@PathVariable Long condominioId, @PathVariable Long id) {
+        return ResponseEntity.ok(service.findById(condominioId, id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BlocoResponse> update(@PathVariable Long id, @RequestBody BlocoRequest request) {
-        return ResponseEntity.ok(service.update(id, request));
+    public ResponseEntity<BlocoResponse> update(@PathVariable Long condominioId, @PathVariable Long id,
+            @RequestBody BlocoRequest request) {
+        return ResponseEntity.ok(service.update(condominioId, id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.delete(id);
+    public ResponseEntity<Void> delete(@PathVariable Long condominioId, @PathVariable Long id) {
+        service.delete(condominioId, id);
         return ResponseEntity.noContent().build();
     }
 }

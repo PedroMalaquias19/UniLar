@@ -12,6 +12,7 @@ public record CondominioResponse(
         BigDecimal juros,
         BigDecimal multaFixa,
         Integer toleranciaDias,
+        Integer diaCobranca,
         List<BlocoResumo> blocos) {
     public record BlocoResumo(Long id, String nomeBloco, Integer numMoradias) {
     }

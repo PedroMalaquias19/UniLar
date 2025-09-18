@@ -17,6 +17,7 @@ public class MoradiaMapper {
                 .numero(request.numero())
                 .area(request.area())
                 .tipo(request.tipo())
+                .tipologia(request.tipologia())
                 .quota(request.quota())
                 .build();
     }
@@ -24,7 +25,10 @@ public class MoradiaMapper {
     public void updateEntity(Moradia moradia, MoradiaRequest request) {
         moradia.setNumero(request.numero());
         moradia.setArea(request.area());
+        // 'tipo' é obrigatório, então atualizamos sempre
         moradia.setTipo(request.tipo());
+        if (request.tipologia() != null)
+            moradia.setTipologia(request.tipologia());
         moradia.setQuota(request.quota());
     }
 
@@ -36,7 +40,11 @@ public class MoradiaMapper {
                 moradia.getNumero(),
                 moradia.getArea(),
                 moradia.getTipo(),
-                moradia.getQuota());
+                moradia.getTipologia(),
+                moradia.getQuota(),
+                moradia.getBloco().getIdBloco(),
+                moradia.getBloco().getCondominio().getIdCondominio(),
+                moradia.getBloco().getCondominio().getNome());
     }
 
     public List<MoradiaResponse> toResponseList(List<Moradia> list) {

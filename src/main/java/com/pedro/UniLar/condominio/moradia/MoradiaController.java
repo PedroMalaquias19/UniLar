@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -17,7 +18,8 @@ public class MoradiaController {
     private final MoradiaService service;
 
     @PostMapping
-    public ResponseEntity<MoradiaResponse> create(@PathVariable Long blocoId, @RequestBody MoradiaRequest request) {
+    public ResponseEntity<MoradiaResponse> create(@PathVariable Long blocoId,
+            @Valid @RequestBody MoradiaRequest request) {
         MoradiaResponse response = service.create(blocoId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -33,7 +35,7 @@ public class MoradiaController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MoradiaResponse> update(@PathVariable Long id, @RequestBody MoradiaRequest request) {
+    public ResponseEntity<MoradiaResponse> update(@PathVariable Long id, @Valid @RequestBody MoradiaRequest request) {
         return ResponseEntity.ok(service.update(id, request));
     }
 

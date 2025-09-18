@@ -25,7 +25,12 @@ public class Moradia {
     private Double area;
 
     @Enumerated(EnumType.STRING)
-    private TipoMoradia tipo;
+    @Column(nullable = false)
+    private TipoMoradia tipo; 
+
+    // Tipologia textual, ex: T0, T1, T2... Opcional
+    @Column(length = 20)
+    private String tipologia;
 
     @Column(precision = 12, scale = 2)
     private BigDecimal quota;

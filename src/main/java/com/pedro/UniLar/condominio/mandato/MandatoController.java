@@ -17,8 +17,8 @@ public class MandatoController {
     private final MandatoService service;
 
     @PostMapping
-    public ResponseEntity<MandatoResponse> criar(@PathVariable Long condominioId, @RequestBody MandatoRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(condominioId, request));
+    public ResponseEntity<MandatoResponse> criar(@RequestBody MandatoRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(request));
     }
 
     @GetMapping
@@ -39,6 +39,11 @@ public class MandatoController {
     @PostMapping("/{id}/encerrar")
     public ResponseEntity<MandatoResponse> encerrar(@PathVariable Long id) {
         return ResponseEntity.ok(service.encerrar(id));
+    }
+
+    @PostMapping("/{id}/revogar")
+    public ResponseEntity<MandatoResponse> revogar(@PathVariable Long id) {
+        return ResponseEntity.ok(service.revogar(id));
     }
 
     @DeleteMapping("/{id}")

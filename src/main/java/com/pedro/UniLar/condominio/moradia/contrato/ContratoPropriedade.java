@@ -9,9 +9,7 @@ import lombok.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "contratos_propriedade", uniqueConstraints = {
-        @UniqueConstraint(name = "uk_contrato_ativo_moradia", columnNames = { "moradia_id", "status" })
-})
+@Table(name = "contratos_propriedade")
 @Getter
 @Setter
 @NoArgsConstructor

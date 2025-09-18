@@ -11,7 +11,7 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "mandatos", uniqueConstraints = {
-        @UniqueConstraint(name = "uk_mandato_condominio_ativo", columnNames = { "condominio_id", "status" })
+        @UniqueConstraint(name = "uk_mandato_condominio_ativo", columnNames = { "condominio_id", "status_contrato" })
 })
 @Getter
 @Setter
@@ -33,7 +33,7 @@ public class Mandato {
     private Condominio condominio;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status_contrato", nullable = false)
     private StatusContrato statusContrato;
 
     @Column(nullable = false)
@@ -43,10 +43,6 @@ public class Mandato {
 
     @Column(precision = 12, scale = 2)
     private BigDecimal salario;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private StatusContrato status;
 
     private String contratoUrl;
 }

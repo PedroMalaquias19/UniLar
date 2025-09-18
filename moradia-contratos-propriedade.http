@@ -1,0 +1,104 @@
+### =============================================================
+### Variáveis Globais (assumem tokens já definidos)
+### =============================================================
+@base-url = http://localhost:8081
+@admin-token = {{admin-token}}
+@sindico-token = {{sindico-token}}
+@moradia-id = {{moradia-id-101}}
+@proprietario-id = 1
+
+### Observações
+# - Apenas ADMIN ou SÍNDICO com mandato ativo no condomínio da moradia podem criar contratos.
+# - Apenas um contrato ATIVO por moradia é permitido.
+# - Datas: 'inicio' obrigatório; 'fim' opcional e deve ser >= inicio.
+
+
+### =============================================================
+### 1) Criar contrato de propriedade (ADMIN)
+### =============================================================
+POST {{base-url}}/api/v1/moradias/{{moradia-id}}/contratos-propriedade
+Content-Type: application/json
+Authorization: Bearer {{admin-token}}
+
+{
+  "proprietarioId": {{proprietario-id}},
+  "inicio": "2025-01-05",
+  "fim": null,
+  "contratoUrl": "https://files.example.com/contratos/contrato-{{moradia-id}}.pdf"
+}
+> {% client.global.set("contrato-id-ativo", response.body.id); %}
+
+
+### =============================================================
+### 2) Obter contrato ATIVO da moradia
+### =============================================================
+GET {{base-url}}/api/v1/moradias/{{moradia-id}}/contratos-propriedade/ativo
+Authorization: Bearer {{admin-token}}
+
+
+### =============================================================
+### 3) Histórico de contratos da moradia (ordem desc por início)
+### =============================================================
+GET {{base-url}}/api/v1/moradias/{{moradia-id}}/contratos-propriedade/historico
+Authorization: Bearer {{admin-token}}
+
+
+### =============================================================
+### 4) Encerrar contrato ATUAL (status -> ENCERRADO, fim = hoje)
+### =============================================================
+POST {{base-url}}/api/v1/moradias/{{moradia-id}}/contratos-propriedade/{{contrato-id-ativo}}/encerrar
+Authorization: Bearer {{admin-token}}
+
+
+### =============================================================
+### 5) Rescindir contrato ATUAL (status -> RESCINDIDO, fim = hoje)
+### =============================================================
+POST {{base-url}}/api/v1/moradias/{{moradia-id}}/contratos-propriedade/{{contrato-id-ativo}}/rescindir
+Authorization: Bearer {{admin-token}}
+
+
+### =============================================================
+### 6) (Opcional) Tentar criar segundo contrato ATIVO (espera 403)
+### =============================================================
+# POST {{base-url}}/api/v1/moradias/{{moradia-id}}/contratos-propriedade
+# Content-Type: application/json
+# Authorization: Bearer {{admin-token}}
+#
+# {
+#   "proprietarioId": {{proprietario-id}},
+#   "inicio": "2025-02-01",
+#   "fim": null,
+#   "contratoUrl": "https://files.example.com/contratos/novo-{{moradia-id}}.pdf"
+# }
+
+
+### =============================================================
+### 7) Criar contrato (SÍNDICO com mandato ativo)
+### =============================================================
+POST {{base-url}}/api/v1/moradias/{{moradia-id}}/contratos-propriedade
+Content-Type: application/json
+Authorization: Bearer {{sindico-token}}
+
+{
+  "proprietarioId": {{proprietario-id}},
+  "inicio": "2025-03-01",
+  "fim": "2025-12-31",
+  "contratoUrl": "https://files.example.com/contratos/sindico-{{moradia-id}}.pdf"
+}
+> {% client.global.set("contrato-id-sindico", response.body.id); %}
+
+
+### =============================================================
+### 8) (Erro esperado) Criar contrato sem permissão (403)
+### =============================================================
+# @moradia-id = {{moradia-id-101}}
+# POST {{base-url}}/api/v1/moradias/{{moradia-id}}/contratos-propriedade
+# Content-Type: application/json
+# Authorization: Bearer {{condomino-token}}
+#
+# {
+#   "proprietarioId": {{proprietario-id}},
+#   "inicio": "2025-01-05",
+#   "fim": null,
+#   "contratoUrl": "https://files.example.com/contratos/sem-permissao-{{moradia-id}}.pdf"
+# }

@@ -7,12 +7,16 @@ import com.pedro.UniLar.condominio.mandato.dto.MandatoResponse;
 import com.pedro.UniLar.condominio.mandato.enums.StatusContrato;
 import com.pedro.UniLar.exception.BadRequestException;
 import com.pedro.UniLar.exception.NotAllowedException;
+import com.pedro.UniLar.profile.user.entities.User;
+import com.pedro.UniLar.profile.user.enums.Role;
 import com.pedro.UniLar.exception.NotFoundException;
 import com.pedro.UniLar.profile.user.entities.Sindico;
 import com.pedro.UniLar.profile.user.repositories.SindicoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -28,8 +32,8 @@ public class MandatoService {
     private final MandatoMapper mapper;
 
     @Transactional
-    public MandatoResponse create(Long condominioId, MandatoRequest request) {
-        Condominio condominio = condominioService.getEntity(condominioId);
+    public MandatoResponse create(MandatoRequest request) {
+        Condominio condominio = condominioService.getEntity(request.condominioId());
         Sindico sindico = sindicoRepository.findById(request.sindicoId())
                 .orElseThrow(() -> new NotFoundException("Síndico não encontrado: " + request.sindicoId()));
 
@@ -39,7 +43,7 @@ public class MandatoService {
         Mandato mandato = mapper.toEntity(request);
         mandato.setCondominio(condominio);
         mandato.setSindico(sindico);
-        mandato.setStatus(StatusContrato.ATIVO);
+        mandato.setStatusContrato(StatusContrato.ATIVO);
 
         Mandato salvo = repository.save(mandato);
         sindico.adicionarMandato(salvo);
@@ -58,11 +62,34 @@ public class MandatoService {
 
     @Transactional
     public MandatoResponse encerrar(Long id) {
+        // Apenas ADMIN pode encerrar mandato
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof User user)
+                || user.getRole() != Role.ADMIN) {
+            throw new NotAllowedException("Apenas administradores podem encerrar mandato");
+        }
         Mandato mandato = getEntity(id);
-        if (mandato.getStatus() != StatusContrato.ATIVO) {
+        if (mandato.getStatusContrato() != StatusContrato.ATIVO) {
             throw new NotAllowedException("Mandato não está ativo");
         }
-        mandato.setStatus(StatusContrato.ENCERRADO);
+        mandato.setStatusContrato(StatusContrato.ENCERRADO);
+        mandato.setFimMandato(LocalDate.now());
+        return mapper.toResponse(mandato);
+    }
+
+    @Transactional
+    public MandatoResponse revogar(Long id) {
+        // Apenas ADMIN pode revogar contrato ativo de um síndico
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof User user)
+                || user.getRole() != Role.ADMIN) {
+            throw new NotAllowedException("Apenas administradores podem revogar mandato");
+        }
+        Mandato mandato = getEntity(id);
+        if (mandato.getStatusContrato() != StatusContrato.ATIVO) {
+            throw new NotAllowedException("Só é possível revogar contratos ativos");
+        }
+        mandato.setStatusContrato(StatusContrato.RESCINDIDO);
         mandato.setFimMandato(LocalDate.now());
         return mapper.toResponse(mandato);
     }
@@ -91,7 +118,7 @@ public class MandatoService {
     }
 
     private void validarMandatoAtivo(Long condominioId) {
-        if (repository.existsByCondominio_IdCondominioAndStatus(condominioId, StatusContrato.ATIVO)) {
+        if (repository.existsByCondominio_IdCondominioAndStatusContrato(condominioId, StatusContrato.ATIVO)) {
             throw new NotAllowedException("Já existe um mandato ativo neste condomínio");
         }
     }

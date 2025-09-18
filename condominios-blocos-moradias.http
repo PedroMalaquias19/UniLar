@@ -1,0 +1,209 @@
+### =============================================================
+### Variáveis Globais (assumem tokens já definidos em register-user.http)
+### =============================================================
+@base-url = http://localhost:8081
+@admin-token = {{admin-token}}
+@sindico-token = {{sindico-token}}
+
+### (Opcional) Se precisar, faça login e capture tokens no arquivo register-user.http antes de rodar este.
+
+
+### =============================================================
+### 1) CONDOMÍNIOS — CRUD COMPLETO
+### =============================================================
+
+### Criar Condomínio (Admin) — juros explícito
+POST {{base-url}}/api/v1/condominios
+Content-Type: application/json
+Authorization: Bearer {{admin-token}}
+
+{
+  "nome": "Condomínio Alphaville",
+  "descricao": "Condomínio residencial com lazer completo",
+  "quota": 25000.00,
+  "juros": 2.50,
+  "toleranciaDias": 5,
+  "diaCobranca": 1
+}
+> {% client.global.set("condominio-id-1", response.body.id); %}
+
+### Criar Condomínio (Admin) — juros calculado por multaFixa/quota
+POST {{base-url}}/api/v1/condominios
+Content-Type: application/json
+Authorization: Bearer {{admin-token}}
+
+{
+  "nome": "Condomínio Bela Vista",
+  "descricao": "Condomínio familiar com 5 blocos",
+  "quota": 18000.00,
+  "multaFixa": 3600.00,
+  "toleranciaDias": 3,
+  "diaCobranca": 1
+}
+> {% client.global.set("condominio-id-2", response.body.id); %}
+
+### Listar Condomínios
+GET {{base-url}}/api/v1/condominios
+Authorization: Bearer {{admin-token}}
+
+### Buscar Condomínio por ID
+GET {{base-url}}/api/v1/condominios/{{condominio-id-1}}
+Authorization: Bearer {{admin-token}}
+
+### Atualizar Condomínio
+PUT {{base-url}}/api/v1/condominios/{{condominio-id-1}}
+Content-Type: application/json
+Authorization: Bearer {{admin-token}}
+
+{
+  "nome": "Condomínio Alphaville - Atualizado",
+  "descricao": "Atualizado: piscina aquecida e coworking",
+  "quota": 26000.00,
+  "juros": 2.50,
+  "toleranciaDias": 6,
+  "diaCobranca": 1
+}
+
+### (Opcional) Remover Condomínio 2 (se desejar)
+# DELETE {{base-url}}/api/v1/condominios/{{condominio-id-2}}
+# Authorization: Bearer {{admin-token}}
+
+
+### =============================================================
+### 2) BLOCOS — CRUD COMPLETO (por Condomínio)
+### =============================================================
+
+### Criar Bloco (Síndico com mandato ativo OU Admin)
+POST {{base-url}}/api/v1/condominios/1/blocos
+Content-Type: application/json
+Authorization: Bearer {{sindico-token}}
+
+{
+  "nomeBloco": "Bloco A",
+  "numMoradias": 6
+}
+> {% client.global.set("bloco-id-A", response.body.id); %}
+
+### Criar outro Bloco (Admin)
+POST {{base-url}}/api/v1/condominios/{{condominio-id-1}}/blocos
+Content-Type: application/json
+Authorization: Bearer {{admin-token}}
+
+{
+  "nomeBloco": "Bloco B",
+  "numMoradias": 8
+}
+> {% client.global.set("bloco-id-B", response.body.id); %}
+
+### Listar Blocos do Condomínio
+GET {{base-url}}/api/v1/condominios/{{condominio-id-1}}/blocos
+Authorization: Bearer {{admin-token}}
+
+### Detalhar Bloco por ID
+GET {{base-url}}/api/v1/condominios/{{condominio-id-1}}/blocos/{{bloco-id-A}}
+Authorization: Bearer {{admin-token}}
+
+### Atualizar Bloco
+PUT {{base-url}}/api/v1/condominios/{{condominio-id-1}}/blocos/{{bloco-id-A}}
+Content-Type: application/json
+Authorization: Bearer {{admin-token}}
+
+{
+  "nomeBloco": "Bloco A - Atualizado",
+  "numMoradias": 10
+}
+
+### Remover Bloco B
+DELETE {{base-url}}/api/v1/condominios/{{condominio-id-1}}/blocos/{{bloco-id-B}}
+Authorization: Bearer {{admin-token}}
+
+
+### =============================================================
+### 3) MORADIAS — CRUD COMPLETO (por Bloco)
+###     Atenção: 'tipo' é OBRIGATÓRIO, 'tipologia' é OPCIONAL
+### =============================================================
+
+### Criar Moradia (Admin) — caminho correto: /api/v1/blocos/{blocoId}/moradias
+POST {{base-url}}/api/v1/blocos/{{bloco-id-A}}/moradias
+Content-Type: application/json
+Authorization: Bearer {{admin-token}}
+
+{
+  "numero": 101,
+  "area": 85.5,
+  "tipo": "CASA",
+  "tipologia": "T2",
+  "quota": 12000.00
+}
+> {% client.global.set("moradia-id-101", response.body.id); %}
+
+### Criar outra Moradia (Síndico com mandato ativo)
+POST {{base-url}}/api/v1/blocos/{{bloco-id-A}}/moradias
+Content-Type: application/json
+Authorization: Bearer {{sindico-token}}
+
+{
+  "numero": 102,
+  "area": 95.0,
+  "tipo": "CASA",
+  "tipologia": "T3",
+  "quota": 13000.00
+}
+> {% client.global.set("moradia-id-102", response.body.id); %}
+
+### Listar Moradias do Bloco
+GET {{base-url}}/api/v1/blocos/{{bloco-id-A}}/moradias
+Authorization: Bearer {{admin-token}}
+
+### Detalhar Moradia por ID
+GET {{base-url}}/api/v1/blocos/{{bloco-id-A}}/moradias/{{moradia-id-101}}
+Authorization: Bearer {{admin-token}}
+
+### Atualizar Moradia (tipo obrigatório permanece)
+PUT {{base-url}}/api/v1/blocos/{{bloco-id-A}}/moradias/{{moradia-id-101}}
+Content-Type: application/json
+Authorization: Bearer {{admin-token}}
+
+{
+  "numero": 101,
+  "area": 90.0,
+  "tipo": "CASA",
+  "tipologia": "T2+1",
+  "quota": 12500.00
+}
+
+### Remover Moradia 102
+DELETE {{base-url}}/api/v1/blocos/{{bloco-id-A}}/moradias/{{moradia-id-102}}
+Authorization: Bearer {{admin-token}}
+
+
+### =============================================================
+### 4) CENÁRIOS DE ERRO/NEGADOS (Opcional)
+### =============================================================
+
+### (Esperado 403) Criar Bloco com Síndico SEM mandato ativo
+# POST {{base-url}}/api/v1/condominios/{{condominio-id-1}}/blocos
+# Content-Type: application/json
+# Authorization: Bearer {{sindico-token}}
+#
+# {
+#   "nomeBloco": "Bloco X",
+#   "numMoradias": 4
+# }
+
+### (Esperado 400) Criar Moradia faltando 'tipo' (obrigatório)
+# POST {{base-url}}/api/v1/blocos/{{bloco-id-A}}/moradias
+# Content-Type: application/json
+# Authorization: Bearer {{admin-token}}
+#
+# {
+#   "numero": 201,
+#   "area": 70.0,
+#   "tipologia": "T1",
+#   "quota": 11000.00
+# }
+
+### (Esperado 404) Buscar Bloco inexistente
+# GET {{base-url}}/api/v1/condominios/{{condominio-id-1}}/blocos/999999
+# Authorization: Bearer {{admin-token}}
+

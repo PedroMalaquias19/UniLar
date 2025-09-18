@@ -3,6 +3,7 @@ package com.pedro.UniLar.condominio.moradia.contrato;
 import com.pedro.UniLar.condominio.moradia.contrato.dto.ContratoPropriedadeRequest;
 import com.pedro.UniLar.condominio.moradia.contrato.dto.ContratoPropriedadeResponse;
 import lombok.RequiredArgsConstructor;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,7 @@ public class ContratoPropriedadeController {
     private final ContratoPropriedadeService service;
 
     @PostMapping
-    public ResponseEntity<ContratoPropriedadeResponse> criar(@PathVariable Long moradiaId, @RequestBody ContratoPropriedadeRequest request){
+    public ResponseEntity<ContratoPropriedadeResponse> criar(@PathVariable Long moradiaId, @Valid @RequestBody ContratoPropriedadeRequest request){
         return ResponseEntity.status(HttpStatus.CREATED).body(service.criar(moradiaId, request));
     }
 
