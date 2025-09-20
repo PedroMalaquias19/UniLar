@@ -4,6 +4,7 @@ import com.pedro.UniLar.condominio.bloco.Bloco;
 import com.pedro.UniLar.condominio.moradia.enums.TipoMoradia;
 import jakarta.persistence.*;
 import com.pedro.UniLar.pagamento.Pagamento;
+import com.pedro.UniLar.profile.user.entities.Condomino;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -43,4 +44,24 @@ public class Moradia {
     @OneToMany(mappedBy = "moradia", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private java.util.List<Pagamento> pagamentos = new java.util.ArrayList<>();
+
+    // Moradores associados diretamente à moradia (DEPENDENTE, FUNCIONARIO, OUTRO)
+    // Proprietário/Inquilino são geridos pela entidade ContratoPropriedade
+    @OneToMany(mappedBy = "moradia", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private java.util.List<Condomino> moradores = new java.util.ArrayList<>();
+
+    public void adicionarMorador(Condomino condomino) {
+        if (condomino == null)
+            return;
+        condomino.setMoradia(this);
+        this.moradores.add(condomino);
+    }
+
+    public void removerMorador(Condomino condomino) {
+        if (condomino == null)
+            return;
+        this.moradores.remove(condomino);
+        condomino.setMoradia(null);
+    }
 }
