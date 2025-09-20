@@ -181,6 +181,10 @@ Authorization: Bearer {{admin-token}}
 ### 4) CENÁRIOS DE ERRO/NEGADOS (Opcional)
 ### =============================================================
 
+### (Novo) Listar moradias por CONDOMÍNIO (usando novo endpoint)
+GET {{base-url}}/api/v1/condominios/{{condominio-id-1}}/moradias
+Authorization: Bearer {{admin-token}}
+
 ### (Esperado 403) Criar Bloco com Síndico SEM mandato ativo
 # POST {{base-url}}/api/v1/condominios/{{condominio-id-1}}/blocos
 # Content-Type: application/json

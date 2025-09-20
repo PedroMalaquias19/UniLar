@@ -66,6 +66,11 @@ public class MoradiaService {
         return mapper.toResponseList(bloco.getMoradias());
     }
 
+    public List<MoradiaResponse> listByCondominio(Long condominioId) {
+        var moradias = repository.findByBloco_Condominio_IdCondominio(condominioId);
+        return mapper.toResponseList(moradias);
+    }
+
     @Transactional
     public MoradiaResponse update(Long id, MoradiaRequest request) {
         Moradia moradia = getEntity(id);

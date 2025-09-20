@@ -99,13 +99,18 @@ public class AuthService {
 
         revokeAllUserTokens(user);
 
-        var jwtToken = jwtService.generateToken(user);
+        var extra = new java.util.HashMap<String, Object>();
+        extra.put("idUsuario", user.getIdUsuario());
+        extra.put("role", user.getRole().name());
+        extra.put("email", user.getEmail());
+        var jwtToken = jwtService.generateToken(extra, user);
         var jwtRefreshToken = jwtService.generateRefreshToken(user);
         saveUserToken(user, jwtToken);
 
         return AuthResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(jwtRefreshToken)
+                .role(user.getRole().name())
                 .build();
     }
 
