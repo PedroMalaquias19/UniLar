@@ -29,8 +29,11 @@ public class MoradiaService {
     private final MandatoRepository mandatoRepository;
 
     @Transactional
-    public MoradiaResponse create(Long blocoId, MoradiaRequest request) {
-        Bloco bloco = blocoService.getEntity(blocoId);
+    public MoradiaResponse create(Long condominioId, MoradiaRequest request) {
+        Bloco bloco = blocoService.getEntity(request.blocoId());
+        if (!bloco.getCondominio().getIdCondominio().equals(condominioId)) {
+            throw new NotAllowedException("Bloco informado não pertence ao condomínio enviado no path");
+        }
         // Authorization: ADMIN or active SINDICO for the condomínio of the bloco can
         // create
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -41,7 +44,7 @@ public class MoradiaService {
             // Admin can create directly
         } else if (user.getRole() == Role.SINDICO) {
             Sindico sindico = (Sindico) user;
-            var mandatoOpt = mandatoRepository.findMandatoAtivo(bloco.getCondominio().getIdCondominio());
+            var mandatoOpt = mandatoRepository.findMandatoAtivo(condominioId);
             if (mandatoOpt.isEmpty() || !mandatoOpt.get().getSindico().getIdUsuario().equals(sindico.getIdUsuario())) {
                 throw new NotAllowedException(
                         "Apenas o síndico com mandato ativo pode criar moradias neste condomínio");
@@ -50,20 +53,18 @@ public class MoradiaService {
             throw new NotAllowedException(
                     "Apenas administradores ou síndicos com mandato ativo podem criar moradias neste condomínio");
         }
-        Moradia moradia = mapper.toEntity(request);
-        moradia.setBloco(bloco);
+        Moradia moradia = mapper.toEntity(request, bloco);
         Moradia saved = repository.save(moradia);
         bloco.adicionarMoradia(saved);
         return mapper.toResponse(saved);
     }
 
-    public MoradiaResponse findById(Long id) {
-        return mapper.toResponse(getEntity(id));
-    }
-
-    public List<MoradiaResponse> listByBloco(Long blocoId) {
-        Bloco bloco = blocoService.getEntity(blocoId);
-        return mapper.toResponseList(bloco.getMoradias());
+    public MoradiaResponse findById(Long condominioId, Long id) {
+        Moradia moradia = getEntity(id);
+        if (!moradia.getBloco().getCondominio().getIdCondominio().equals(condominioId)) {
+            throw new NotFoundException("Moradia não pertence ao condomínio informado");
+        }
+        return mapper.toResponse(moradia);
     }
 
     public List<MoradiaResponse> listByCondominio(Long condominioId) {
@@ -72,11 +73,13 @@ public class MoradiaService {
     }
 
     @Transactional
-    public MoradiaResponse update(Long id, MoradiaRequest request) {
+    public MoradiaResponse update(Long condominioId, Long id, MoradiaRequest request) {
         Moradia moradia = getEntity(id);
+        if (!moradia.getBloco().getCondominio().getIdCondominio().equals(condominioId)) {
+            throw new NotFoundException("Moradia não pertence ao condomínio informado");
+        }
         // Authorization: ADMIN or active SINDICO for the condomínio of the moradia's
         // bloco can update
-        Bloco bloco = moradia.getBloco();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof User user)) {
             throw new NotAllowedException("Autenticação necessária");
@@ -85,7 +88,7 @@ public class MoradiaService {
             // Admin can update directly
         } else if (user.getRole() == Role.SINDICO) {
             Sindico sindico = (Sindico) user;
-            var mandatoOpt = mandatoRepository.findMandatoAtivo(bloco.getCondominio().getIdCondominio());
+            var mandatoOpt = mandatoRepository.findMandatoAtivo(condominioId);
             if (mandatoOpt.isEmpty() || !mandatoOpt.get().getSindico().getIdUsuario().equals(sindico.getIdUsuario())) {
                 throw new NotAllowedException(
                         "Apenas o síndico com mandato ativo pode atualizar moradias deste condomínio");
@@ -94,13 +97,25 @@ public class MoradiaService {
             throw new NotAllowedException(
                     "Apenas administradores ou síndicos com mandato ativo podem atualizar moradias deste condomínio");
         }
+        // Se blocoId vier diferente, validar e atualizar bloco e quota
+        if (request.blocoId() != null && (moradia.getBloco() == null || !moradia.getBloco().getIdBloco().equals(request.blocoId()))) {
+            Bloco novoBloco = blocoService.getEntity(request.blocoId());
+            if (!novoBloco.getCondominio().getIdCondominio().equals(condominioId)) {
+                throw new NotAllowedException("Bloco informado não pertence ao condomínio enviado no path");
+            }
+            moradia.setBloco(novoBloco);
+            moradia.setQuota(novoBloco.getCondominio().getQuota());
+        }
         mapper.updateEntity(moradia, request);
         return mapper.toResponse(moradia);
     }
 
     @Transactional
-    public void delete(Long id) {
+    public void delete(Long condominioId, Long id) {
         Moradia moradia = getEntity(id);
+        if (!moradia.getBloco().getCondominio().getIdCondominio().equals(condominioId)) {
+            throw new NotFoundException("Moradia não pertence ao condomínio informado");
+        }
         repository.delete(moradia);
     }
 

@@ -26,7 +26,7 @@ public class Moradia {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TipoMoradia tipo; 
+    private TipoMoradia tipo;
 
     // Tipologia textual, ex: T0, T1, T2... Opcional
     @Column(length = 20)
