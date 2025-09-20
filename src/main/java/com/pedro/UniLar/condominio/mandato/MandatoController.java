@@ -45,10 +45,4 @@ public class MandatoController {
     public ResponseEntity<MandatoResponse> revogar(@PathVariable Long id) {
         return ResponseEntity.ok(service.revogar(id));
     }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        service.deletar(id);
-        return ResponseEntity.noContent().build();
-    }
 }

@@ -36,6 +36,7 @@ public class CondominioController {
         return ResponseEntity.ok(service.update(id, request));
     }
 
+    // Não é possível apagar condomínios
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);

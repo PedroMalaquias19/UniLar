@@ -3,6 +3,8 @@ package com.pedro.UniLar.condominio.moradia;
 import com.pedro.UniLar.condominio.bloco.Bloco;
 import com.pedro.UniLar.condominio.moradia.dto.MoradiaRequest;
 import com.pedro.UniLar.condominio.moradia.dto.MoradiaResponse;
+import com.pedro.UniLar.profile.user.dto.CondominoResponse;
+import com.pedro.UniLar.profile.user.entities.Condomino;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -53,5 +55,19 @@ public class MoradiaMapper {
 
     public List<MoradiaResponse> toResponseList(List<Moradia> list) {
         return list.stream().map(this::toResponse).collect(Collectors.toList());
+    }
+
+    public CondominoResponse toCondominoResponse(Condomino c) {
+        if (c == null)
+            return null;
+        return new CondominoResponse(
+                c.getIdUsuario(),
+                c.getNome(),
+                c.getSobrenome(),
+                c.getEmail(),
+                c.getTelefone(),
+                c.getNIF(),
+                c.getFotografia().orElse(null),
+                c.getTipo());
     }
 }

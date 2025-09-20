@@ -5,6 +5,9 @@ import com.pedro.UniLar.condominio.moradia.dto.MoradiaResponse;
 import com.pedro.UniLar.condominio.bloco.Bloco;
 import com.pedro.UniLar.condominio.bloco.BlocoService;
 import com.pedro.UniLar.condominio.mandato.MandatoRepository;
+import com.pedro.UniLar.condominio.moradia.contrato.ContratoPropriedadeRepository;
+import com.pedro.UniLar.condominio.moradia.contrato.ContratoPropriedadeMapper;
+import com.pedro.UniLar.condominio.moradia.dto.MoradiaDetalheResponse;
 import com.pedro.UniLar.exception.NotAllowedException;
 import com.pedro.UniLar.exception.NotFoundException;
 import com.pedro.UniLar.profile.user.entities.Sindico;
@@ -31,6 +34,8 @@ public class MoradiaService {
     private final BlocoService blocoService;
     private final MandatoRepository mandatoRepository;
     private final CondominoRepository condominoRepository;
+    private final ContratoPropriedadeRepository contratoPropriedadeRepository;
+    private final ContratoPropriedadeMapper contratoPropriedadeMapper;
 
     @Transactional
     public MoradiaResponse create(Long condominioId, MoradiaRequest request) {
@@ -204,6 +209,29 @@ public class MoradiaService {
         }
         moradia.removerMorador(condomino);
         condominoRepository.save(condomino);
+    }
+
+    public MoradiaDetalheResponse detalhes(Long condominioId, Long moradiaId) {
+        Moradia moradia = getEntity(moradiaId);
+        if (!moradia.getBloco().getCondominio().getIdCondominio().equals(condominioId)) {
+            throw new NotFoundException("Moradia não pertence ao condomínio informado");
+        }
+
+        var moradiaResp = mapper.toResponse(moradia);
+
+        var contratoAtivoOpt = contratoPropriedadeRepository.findAtivoByMoradia(moradiaId);
+        var contratoResp = contratoAtivoOpt.map(contratoPropriedadeMapper::toResponse).orElse(null);
+
+        var proprietarioResp = contratoAtivoOpt
+                .map(c -> mapper.toCondominoResponse(c.getProprietario()))
+                .orElse(null);
+
+        var dependentes = moradia.getMoradores().stream()
+                .filter(c -> c.getTipo() != TipoCondomino.PROPRIETARIO && c.getTipo() != TipoCondomino.INCLINO)
+                .map(mapper::toCondominoResponse)
+                .toList();
+
+        return new MoradiaDetalheResponse(moradiaResp, contratoResp, proprietarioResp, dependentes);
     }
 
     public Moradia getEntity(Long id) {

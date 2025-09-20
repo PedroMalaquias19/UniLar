@@ -19,12 +19,12 @@ POST {{base-url}}/api/v1/auth/register/admin
 Content-Type: application/json
 
 {
-  "nome": "Admin",
-  "sobrenome": "Root",
-  "email": "{{admin-email}}",
-  "password": "{{admin-pass}}",
-  "NIF": "ADM001234567",
-  "telefone": "910000000"
+  "nome": "Pedro",
+  "sobrenome": "Malaquias 3",
+  "email": "pedro.malaquias3@unilar.co.ao",
+  "password": "Malaquias000",
+  "NIF": "ADM0012345199",
+  "telefone": "967655218"
 }
 
 ### =============================================================
@@ -35,11 +35,15 @@ POST {{base-url}}/api/v1/auth/login
 Content-Type: application/json
 
 {
-  "email": "{{admin-email}}",
-  "password": "{{admin-pass}}"
+  "email": "pedro.malaquias@unilar.co.ao",
+  "password": "Malaquias000"
 }
 > {% client.global.set("admin-token", response.body.access_token); %}
 
+###
+GET {{base-url}}/api/v1/users/
+Content-Type: application/json
+Authorization: Bearer {{admin-token}}
 
 ### =============================================================
 ### 3) Registro de Síndico (Requer token ADMIN com sindico:create/admin:create)
@@ -50,11 +54,11 @@ Content-Type: application/json
 Authorization: Bearer {{admin-token}}
 
 {
-  "nome": "Maria",
-  "sobrenome": "Silva",
-  "email": "{{sindico-email}}",
-  "password": "{{sindico-pass}}",
-  "NIF": "SIND12345678",
+  "nome": "Antonio",
+  "sobrenome": "Rosa",
+  "email": "antonio.rosa@unilar.co.ao",
+  "password": "Rosa",
+  "NIF": "SIND12345684",
   "telefone": "911111111"
 }
 
@@ -65,10 +69,12 @@ POST {{base-url}}/api/v1/auth/login
 Content-Type: application/json
 
 {
-  "email": "{{sindico-email}}",
-  "password": "{{sindico-pass}}"
+  "email": "maria.sindico@example.com",
+  "password": "sindicoPass"
 }
 > {% client.global.set("sindico-token", response.body.access_token); %}
+
+### Registro de condominio
 
 ### =============================================================
 ### 4) Registro de Condômino (Requer token ADMIN ou permissão condomino:create)
@@ -78,13 +84,13 @@ Content-Type: application/json
 Authorization: Bearer {{admin-token}}
 
 {
-  "nome": "João",
-  "sobrenome": "Pereira",
-  "email": "{{condomino-email}}",
-  "password": "{{condomino-pass}}",
-  "NIF": "COND98765432",
+  "nome": "Enzo",
+  "sobrenome": "Dos Santos",
+  "email": "dsantos@unilar.co.ao",
+  "password": "DSantos",
+  "NIF": "COND98765f122",
   "telefone": "922222222",
-  "tipo": "PROPRIETARIO"
+  "tipo": "DEPENDENTE"
 }
 
 ### (Opcional) Login Condômino
@@ -92,8 +98,8 @@ POST {{base-url}}/api/v1/auth/login
 Content-Type: application/json
 
 {
-  "email": "{{condomino-email}}",
-  "password": "{{condomino-pass}}"
+  "email": "joao@unilar.co.ao",
+  "password": "Perreira"
 }
 > {% client.global.set("condomino-token", response.body.accessToken); %}
 
@@ -103,7 +109,6 @@ Content-Type: application/json
 # {{admin-token}}
 # {{sindico-token}}
 # {{condomino-token}}
-
 
 ### Condominio Request
 POST {{base-url}}/api/v1/condominios
@@ -125,13 +130,18 @@ Content-Type: application/json
 Authorization: Bearer {{admin-token}}
 
 {
-  "nome": "Residencial Bela Vista",
+  "nome": "Residencial Bela Vista 3",
   "descricao": "Condomínio familiar com 5 blocos, jardim comunitário e estacionamento para visitantes.",
   "quota": 18000.00,
   "multaFixa": 3000.00,
-  "toleranciaDias": 3,
-  "diaCobranca": 1
+  "toleranciaDias": 7,
+  "diaCobranca": 20
 }
+
+###
+DELETE {{base-url}}/api/v1/condominios/4
+Content-Type: application/json
+Authorization: Bearer {{admin-token}}
 
 
 ### Bloco - CRUD
@@ -251,18 +261,25 @@ Authorization: Bearer {{admin-token}}
 # Se não tiver sido capturado no registro, ajuste o valor manualmente
 # @sindico-id = <coloque-aqui-o-id-do-sindico>
 
-POST {{base-url}}/api/v1/condominios/mandatos
+PUT {{base-url}}/api/v1/condominios/2/mandatos/2
 Content-Type: application/json
 Authorization: Bearer {{admin-token}}
 
 {
-  "sindicoId": 3,
-  "condominioId": 1,
+  "sindicoId": 52,
+  "condominioId": 2,
   "inicioMandato": "2025-01-01",
-  "fimMandato": "2025-12-31",
+  "fimMandato": "2027-12-31",
   "salario": 1000000.0
 }
 > {% client.global.set("mandato-id-1", response.body.id); %}
+
+###
+POST {{base-url}}/api/v1/condominios/2/mandatos/2/encerrar
+Content-Type: application/json
+Authorization: Bearer {{admin-token}}
+
+
 
 ### (Opcional) Listar mandatos do condomínio
 GET {{base-url}}/api/v1/condominios/1/mandatos
@@ -278,8 +295,8 @@ Content-Type: application/json
 Authorization: Bearer {{sindico-token}}
 
 {
-  "nomeBloco": "Bloco A",
-  "numMoradias": "Bloco voltado para o jardim"
+  "nomeBloco": "Bloco C",
+  "numMoradias": 0
 }
 > {% client.global.set("bloco-id-A", response.body.id); %}
 
@@ -303,16 +320,15 @@ Authorization: Bearer {{admin-token}}
 ### 11) Criar Moradias em um Bloco
 ### =============================================================
 
-POST {{base-url}}/api/v1/condominios/{{condominio-id-1}}/blocos/{{bloco-id-A}}/moradias
+POST {{base-url}}/api/v1/condominios/1/moradias
 Content-Type: application/json
-Authorization: Bearer {{admin-token}}
+Authorization: Bearer {{sindico-token}}
 
 {
-  "numero": "Apt 101",
-  "tipologia": "T2",
-  "fracao": "A",
-  "piso": 1,
-  "areaM2": 85.5
+  "numero": 101,
+  "tipo": "LOJA",
+  "area": 150,
+  "blocoId": 1
 }
 > {% client.global.set("moradia-id-101", response.body.id); %}
 
@@ -331,7 +347,7 @@ Authorization: Bearer {{admin-token}}
 > {% client.global.set("moradia-id-102", response.body.id); %}
 
 ### (Listar moradias do bloco)
-GET {{base-url}}/api/v1/condominios/{{condominio-id-1}}/blocos/{{bloco-id-A}}/moradias
+GET {{base-url}}/api/v1/condominios/1/blocos
 Authorization: Bearer {{admin-token}}
 
 
@@ -366,7 +382,23 @@ Authorization: Bearer {{admin-token}}
   "dataInicio": "2025-02-01"
 }
 
-### (Listar vínculos/condôminos de uma moradia)
-GET {{base-url}}/api/v1/moradias/{{moradia-id-101}}/condominos
-Authorization: Bearer {{admin-token}}
+###
+POST {{base-url}}/api/v1/moradias/1/contratos-propriedade
+Content-Type: application/json
+Authorization: Bearer {{sindico-token}}
 
+{
+  "proprietarioId": 55,
+  "inicio": "2025-01-01",
+  "fim": "2040-12-31"
+}
+
+###
+POST {{base-url}}/api/v1/condominios/1/moradias/1/moradores/56
+Content-Type: application/json
+Authorization: Bearer {{sindico-token}}
+
+###
+GET {{base-url}}/api/v1/condominios/1/moradias/1/detalhes
+Content-Type: application/json
+Authorization: Bearer {{sindico-token}}

@@ -9,6 +9,6 @@ public record MoradiaRequest(
         Double area,
         @NotNull TipoMoradia tipo,
         String tipologia,
-        @NotNull Long blocoId,
-        String blocoNome) {
+        @NotNull Long blocoId
+) {
 }

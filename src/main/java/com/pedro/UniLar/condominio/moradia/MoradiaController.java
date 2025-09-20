@@ -2,6 +2,7 @@ package com.pedro.UniLar.condominio.moradia;
 
 import com.pedro.UniLar.condominio.moradia.dto.MoradiaRequest;
 import com.pedro.UniLar.condominio.moradia.dto.MoradiaResponse;
+import com.pedro.UniLar.condominio.moradia.dto.MoradiaDetalheResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +33,11 @@ public class MoradiaController {
     @GetMapping("/{id}")
     public ResponseEntity<MoradiaResponse> find(@PathVariable Long condominioId, @PathVariable Long id) {
         return ResponseEntity.ok(service.findById(condominioId, id));
+    }
+
+    @GetMapping("/{id}/detalhes")
+    public ResponseEntity<MoradiaDetalheResponse> detalhes(@PathVariable Long condominioId, @PathVariable Long id) {
+        return ResponseEntity.ok(service.detalhes(condominioId, id));
     }
 
     @PutMapping("/{id}")
