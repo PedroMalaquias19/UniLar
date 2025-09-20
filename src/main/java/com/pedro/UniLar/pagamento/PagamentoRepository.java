@@ -19,4 +19,11 @@ public interface PagamentoRepository extends JpaRepository<Pagamento, Long> {
     @Query("select p from Pagamento p where p.moradia.idMoradia = :moradiaId and p.dataCobranca = :dataCobranca and p.tipo = com.pedro.UniLar.pagamento.enums.TipoPagamento.QUOTA")
     List<Pagamento> findQuotaByMoradiaAndDataCobranca(@Param("moradiaId") Long moradiaId,
             @Param("dataCobranca") LocalDate dataCobranca);
+
+    @Query("select p from Pagamento p where p.tipo = com.pedro.UniLar.pagamento.enums.TipoPagamento.QUOTA and p.statusPagamento = com.pedro.UniLar.pagamento.enums.StatusPagamento.PENDENTE and p.vencimento = :ontem")
+    List<Pagamento> findPendentesComVencimento(@Param("ontem") LocalDate ontem);
+
+    @Query("select p from Pagamento p where p.moradia.idMoradia = :moradiaId and p.dataCobranca = :data and p.tipo = com.pedro.UniLar.pagamento.enums.TipoPagamento.MULTA")
+    List<Pagamento> findMultaByMoradiaAndData(@Param("moradiaId") Long moradiaId,
+            @Param("data") LocalDate data);
 }

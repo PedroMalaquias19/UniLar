@@ -73,8 +73,8 @@ public class PagamentoService {
         return pagamentoRepository.save(p);
     }
 
-    // Executa diariamente às 01:15 para gerar pagamentos do dia
-    @Scheduled(cron = "0 15 1 * * *")
+    // Executa diariamente às 00:00 para gerar pagamentos do dia
+    @Scheduled(cron = "0 0 0 * * *")
     @Transactional
     public void gerarPagamentosDoDia() {
         LocalDate hoje = LocalDate.now();
@@ -114,6 +114,50 @@ public class PagamentoService {
                         .build();
                 pagamentoRepository.save(novo);
             }
+        }
+    }
+
+    // Executa diariamente às 00:10 para marcar vencidos e gerar multas
+    @Scheduled(cron = "0 10 0 * * *")
+    @Transactional
+    public void processarVencidosEGerarMultas() {
+        LocalDate hoje = LocalDate.now();
+        LocalDate ontem = hoje.minusDays(1);
+
+        // Todos os pagamentos de QUOTA que venceram ontem e ainda estão PENDENTES
+        var vencidos = pagamentoRepository.findPendentesComVencimento(ontem);
+        for (Pagamento quotaVencida : vencidos) {
+            // 1) Marcar a quota como VENCIDO
+            quotaVencida.setStatusPagamento(StatusPagamento.VENCIDO);
+            pagamentoRepository.save(quotaVencida);
+
+            // 2) Gerar multa, se ainda não gerada para hoje
+            Moradia moradia = quotaVencida.getMoradia();
+            Condominio condominio = moradia.getBloco().getCondominio();
+
+            // Evitar duplicado de multa no mesmo dia
+            if (!pagamentoRepository.findMultaByMoradiaAndData(moradia.getIdMoradia(), hoje).isEmpty()) {
+                continue;
+            }
+
+            BigDecimal multaValor;
+            if (condominio.getMultaFixa() != null && condominio.getMultaFixa().compareTo(BigDecimal.ZERO) > 0) {
+                multaValor = condominio.getMultaFixa();
+            } else {
+                BigDecimal taxa = condominio.getJuros() != null ? condominio.getJuros() : BigDecimal.ZERO;
+                // taxa esperada como percentual (ex.: 0.10 = 10%)
+                multaValor = quotaVencida.getMontante().multiply(taxa);
+            }
+
+            Pagamento multa = Pagamento.builder()
+                    .moradia(moradia)
+                    .montante(multaValor)
+                    .statusPagamento(StatusPagamento.PENDENTE)
+                    .tipo(TipoPagamento.MULTA)
+                    .dataCobranca(hoje)
+                    .vencimento(hoje) // pode ajustar regra de vencimento da multa
+                    .build();
+            pagamentoRepository.save(multa);
         }
     }
 }
