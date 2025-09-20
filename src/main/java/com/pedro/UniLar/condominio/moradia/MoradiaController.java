@@ -45,4 +45,17 @@ public class MoradiaController {
         service.delete(condominioId, id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{moradiaId}/moradores/{condominoId}")
+    public ResponseEntity<MoradiaResponse> adicionarMorador(@PathVariable Long condominioId,
+            @PathVariable Long moradiaId, @PathVariable Long condominoId) {
+        return ResponseEntity.ok(service.adicionarMorador(condominioId, moradiaId, condominoId));
+    }
+
+    @DeleteMapping("/{moradiaId}/moradores/{condominoId}")
+    public ResponseEntity<Void> removerMorador(@PathVariable Long condominioId, @PathVariable Long moradiaId,
+            @PathVariable Long condominoId) {
+        service.removerMorador(condominioId, moradiaId, condominoId);
+        return ResponseEntity.noContent().build();
+    }
 }

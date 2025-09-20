@@ -8,6 +8,9 @@ import com.pedro.UniLar.condominio.mandato.MandatoRepository;
 import com.pedro.UniLar.exception.NotAllowedException;
 import com.pedro.UniLar.exception.NotFoundException;
 import com.pedro.UniLar.profile.user.entities.Sindico;
+import com.pedro.UniLar.profile.user.entities.Condomino;
+import com.pedro.UniLar.profile.user.enums.TipoCondomino;
+import com.pedro.UniLar.profile.user.repositories.CondominoRepository;
 import com.pedro.UniLar.profile.user.entities.User;
 import com.pedro.UniLar.profile.user.enums.Role;
 import org.springframework.security.core.Authentication;
@@ -27,6 +30,7 @@ public class MoradiaService {
     private final MoradiaMapper mapper;
     private final BlocoService blocoService;
     private final MandatoRepository mandatoRepository;
+    private final CondominoRepository condominoRepository;
 
     @Transactional
     public MoradiaResponse create(Long condominioId, MoradiaRequest request) {
@@ -118,6 +122,88 @@ public class MoradiaService {
             throw new NotFoundException("Moradia não pertence ao condomínio informado");
         }
         repository.delete(moradia);
+    }
+
+    @Transactional
+    public MoradiaResponse adicionarMorador(Long condominioId, Long moradiaId, Long condominoId) {
+        Moradia moradia = getEntity(moradiaId);
+        if (!moradia.getBloco().getCondominio().getIdCondominio().equals(condominioId)) {
+            throw new NotFoundException("Moradia não pertence ao condomínio informado");
+        }
+
+        // Authorization: ADMIN or active SÍNDICO for the condomínio
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof User user)) {
+            throw new NotAllowedException("Autenticação necessária");
+        }
+        if (user.getRole() == Role.ADMIN) {
+            // ok
+        } else if (user.getRole() == Role.SINDICO) {
+            Sindico sindico = (Sindico) user;
+            var mandatoOpt = mandatoRepository.findMandatoAtivo(condominioId);
+            if (mandatoOpt.isEmpty() || !mandatoOpt.get().getSindico().getIdUsuario().equals(sindico.getIdUsuario())) {
+                throw new NotAllowedException("Apenas o síndico com mandato ativo pode gerir moradores desta moradia");
+            }
+        } else {
+            throw new NotAllowedException("Apenas administradores ou síndicos com mandato ativo podem gerir moradores");
+        }
+
+        Condomino condomino = condominoRepository.findById(condominoId)
+                .orElseThrow(() -> new NotFoundException("Condómino não encontrado: " + condominoId));
+
+        if (condomino.getTipo() == TipoCondomino.PROPRIETARIO || condomino.getTipo() == TipoCondomino.INCLINO) {
+            throw new NotAllowedException(
+                    "Proprietários/Inquilinos são geridos através de contratos de propriedade");
+        }
+
+        // Vincula à moradia
+        if (condomino.getMoradia() != null && !condomino.getMoradia().getIdMoradia().equals(moradiaId)) {
+            // desvincular da antiga moradia
+            condomino.getMoradia().removerMorador(condomino);
+        }
+        moradia.adicionarMorador(condomino);
+        condominoRepository.save(condomino);
+        return mapper.toResponse(moradia);
+    }
+
+    @Transactional
+    public void removerMorador(Long condominioId, Long moradiaId, Long condominoId) {
+        Moradia moradia = getEntity(moradiaId);
+        if (!moradia.getBloco().getCondominio().getIdCondominio().equals(condominioId)) {
+            throw new NotFoundException("Moradia não pertence ao condomínio informado");
+        }
+
+        // Authorization: ADMIN or active SÍNDICO
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof User user)) {
+            throw new NotAllowedException("Autenticação necessária");
+        }
+        if (user.getRole() == Role.ADMIN) {
+            // ok
+        } else if (user.getRole() == Role.SINDICO) {
+            Sindico sindico = (Sindico) user;
+            var mandatoOpt = mandatoRepository.findMandatoAtivo(condominioId);
+            if (mandatoOpt.isEmpty() || !mandatoOpt.get().getSindico().getIdUsuario().equals(sindico.getIdUsuario())) {
+                throw new NotAllowedException("Apenas o síndico com mandato ativo pode gerir moradores desta moradia");
+            }
+        } else {
+            throw new NotAllowedException("Apenas administradores ou síndicos com mandato ativo podem gerir moradores");
+        }
+
+        Condomino condomino = condominoRepository.findById(condominoId)
+                .orElseThrow(() -> new NotFoundException("Condómino não encontrado: " + condominoId));
+
+        if (condomino.getTipo() == TipoCondomino.PROPRIETARIO || condomino.getTipo() == TipoCondomino.INCLINO) {
+            throw new NotAllowedException(
+                    "Proprietários/Inquilinos são geridos através de contratos de propriedade");
+        }
+
+        if (condomino.getMoradia() == null || !condomino.getMoradia().getIdMoradia().equals(moradiaId)) {
+            // Nada a remover
+            return;
+        }
+        moradia.removerMorador(condomino);
+        condominoRepository.save(condomino);
     }
 
     public Moradia getEntity(Long id) {
