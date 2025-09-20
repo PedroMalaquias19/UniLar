@@ -27,7 +27,7 @@ public class ContratoPropriedade {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "proprietario_id")
-    private Condomino proprietario; // O proprietário vigente
+    private Condomino proprietario;
 
     @Column(nullable = false)
     private LocalDate inicio;

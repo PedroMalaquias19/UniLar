@@ -7,6 +7,8 @@ import com.pedro.UniLar.profile.user.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -42,8 +44,10 @@ public class User implements UserDetails {
     @NotBlank(message = "O email é obrigatório")
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 64)
     @NotBlank(message = "A password é obrigatória")
+    @Size(min = 8, max = 64, message = "A password deve ter entre 8 e 64 caracteres")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).+$", message = "A password deve incluir letra maiúscula, letra minúscula, número e caracter especial")
     private String password;
 
     private String telefone;
