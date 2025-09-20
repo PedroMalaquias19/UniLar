@@ -86,8 +86,9 @@ public class CategoriaService {
         if (condominio == null && user.getRole() != Role.ADMIN)
             throw new NotAllowedException("Apenas administradores podem definir categoria global");
         if (condominio != null && user.getRole() != Role.ADMIN) {
-            boolean ativo = mandatoRepository.existsByCondominio_IdCondominioAndStatusContrato(
-                    condominio.getIdCondominio(), StatusContrato.ATIVO);
+            boolean ativo = mandatoRepository
+                    .existsByCondominio_IdCondominioAndSindico_IdUsuarioAndStatusContrato(
+                            condominio.getIdCondominio(), user.getIdUsuario(), StatusContrato.ATIVO);
             if (!ativo) {
                 throw new NotAllowedException(
                         "Apenas síndicos com mandato ativo ou administradores podem atualizar categorias do condomínio");

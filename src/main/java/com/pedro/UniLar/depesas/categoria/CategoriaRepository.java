@@ -22,4 +22,8 @@ public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
     // o condominio quando existir)
     @Query("select distinct c from Categoria c left join fetch c.condominio cond where c.condominio is null or cond.idCondominio = :condominioId")
     List<Categoria> findGlobaisOuDoCondominio(@Param("condominioId") Long condominioId);
+
+    boolean existsByNomeIgnoreCaseAndCondominioIsNull(String nome);
+
+    java.util.Optional<Categoria> findFirstByNomeIgnoreCaseAndCondominioIsNull(String nome);
 }
