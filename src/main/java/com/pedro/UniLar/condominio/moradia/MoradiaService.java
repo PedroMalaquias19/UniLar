@@ -98,7 +98,8 @@ public class MoradiaService {
                     "Apenas administradores ou síndicos com mandato ativo podem atualizar moradias deste condomínio");
         }
         // Se blocoId vier diferente, validar e atualizar bloco e quota
-        if (request.blocoId() != null && (moradia.getBloco() == null || !moradia.getBloco().getIdBloco().equals(request.blocoId()))) {
+        if (request.blocoId() != null
+                && (moradia.getBloco() == null || !moradia.getBloco().getIdBloco().equals(request.blocoId()))) {
             Bloco novoBloco = blocoService.getEntity(request.blocoId());
             if (!novoBloco.getCondominio().getIdCondominio().equals(condominioId)) {
                 throw new NotAllowedException("Bloco informado não pertence ao condomínio enviado no path");

@@ -51,7 +51,6 @@ public class MoradiaMapper {
                 moradia.getBloco().getCondominio().getNome());
     }
 
-
     public List<MoradiaResponse> toResponseList(List<Moradia> list) {
         return list.stream().map(this::toResponse).collect(Collectors.toList());
     }
