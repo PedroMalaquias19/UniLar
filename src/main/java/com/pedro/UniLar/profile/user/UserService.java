@@ -1,6 +1,6 @@
 package com.pedro.UniLar.profile.user;
 
-import com.pedro.UniLar.awss3.file.FileService;
+import com.pedro.UniLar.file.FileService;
 import com.pedro.UniLar.exception.BadRequestException;
 import com.pedro.UniLar.exception.NotAllowedException;
 import com.pedro.UniLar.exception.NotFoundException;
@@ -26,7 +26,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final FileService fileService;
 
-    public User saveUser(User user){
+    public User saveUser(User user) {
         try {
             user = userRepository.save(user);
             return user;
@@ -35,12 +35,12 @@ public class UserService {
         }
     }
 
-    public User findByEmail(String email){
+    public User findByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("User not found with email: " + email));
     }
 
-    public User findById(Long id){
+    public User findById(Long id) {
         return userRepository
                 .findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
@@ -56,11 +56,11 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void updateRole(UserController.UpdateRoleRequest request, Principal connectedUser){
+    public void updateRole(UserController.UpdateRoleRequest request, Principal connectedUser) {
 
         var admin = getUserFromPrincipal(connectedUser);
 
-        if(!(admin.getRole() == Role.ADMIN)){
+        if (!(admin.getRole() == Role.ADMIN)) {
             throw new NotAllowedException("User does not have authorization to change role");
         }
 
@@ -70,24 +70,24 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void changePassword(UserController.ChangePasswordRequest request, Principal connectedUser){
+    public void changePassword(UserController.ChangePasswordRequest request, Principal connectedUser) {
 
         var user = getUserFromPrincipal(connectedUser);
 
-        //Check if the current password is correct
-        if(!passwordEncoder.matches(request.currentPassword(), user.getPassword())){
+        // Check if the current password is correct
+        if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
             throw new BadRequestException("Wrong password");
         }
 
-        //Check if the provided password are the same
-        if(!Objects.equals(request.newPassword(), request.confirmPassword())){
+        // Check if the provided password are the same
+        if (!Objects.equals(request.newPassword(), request.confirmPassword())) {
             throw new BadRequestException("Provided passwords are not the same");
         }
 
-        //Update the password
+        // Update the password
         user.setPassword(passwordEncoder.encode(request.newPassword()));
 
-        //Save new password
+        // Save new password
         userRepository.save(user);
     }
 
@@ -102,9 +102,8 @@ public class UserService {
         userRepository.save(user);
     }
 
-
     public byte[] downloadUserProfileImage(Long id) {
         User user = findById(id);
-        return fileService.downloadImage(user.getFotografia().orElse(null));
+        return fileService.download(user.getFotografia().orElse(null));
     }
 }

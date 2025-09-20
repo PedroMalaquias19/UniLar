@@ -36,7 +36,10 @@ public class BlocoService {
         if (authentication == null || !(authentication.getPrincipal() instanceof User user)) {
             throw new NotAllowedException("Autenticação necessária");
         }
-        if (user.getRole() == Role.SINDICO) {
+
+        if (user.getRole() == Role.ADMIN) {
+            // just skip and create bloco
+        } else if (user.getRole() == Role.SINDICO) {
             Sindico sindico = (Sindico) user;
             var mandatoOpt = mandatoRepository.findMandatoAtivo(condominio.getIdCondominio());
             if (mandatoOpt.isEmpty() || !mandatoOpt.get().getSindico().getIdUsuario().equals(sindico.getIdUsuario())) {

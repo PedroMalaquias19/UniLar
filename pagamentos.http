@@ -1,0 +1,30 @@
+### Listar pagamentos por moradia
+GET http://localhost:8080/api/pagamentos/moradia/1
+
+### Listar pagamentos por condomínio
+GET http://localhost:8080/api/pagamentos/condominio/1
+
+### Criar pagamento manual (opcional)
+POST http://localhost:8080/api/pagamentos
+Content-Type: application/json
+
+{
+  "moradiaId": 1,
+  "montante": 250.00,
+  "dataCobranca": "2025-09-01",
+  "vencimento": "2025-09-10"
+}
+
+### Confirmar pagamento (enviar comprovativo)
+POST http://localhost:8080/api/pagamentos/1/confirmar
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="comprovativo.pdf"
+Content-Type: application/pdf
+
+< ./sample.pdf
+--WebAppBoundary--
+
+### Fazer download do comprovativo
+GET http://localhost:8080/api/pagamentos/1/comprovativo

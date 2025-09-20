@@ -3,6 +3,7 @@ package com.pedro.UniLar.condominio.moradia;
 import com.pedro.UniLar.condominio.bloco.Bloco;
 import com.pedro.UniLar.condominio.moradia.enums.TipoMoradia;
 import jakarta.persistence.*;
+import com.pedro.UniLar.pagamento.Pagamento;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -38,4 +39,8 @@ public class Moradia {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bloco_id")
     private Bloco bloco;
+
+    @OneToMany(mappedBy = "moradia", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private java.util.List<Pagamento> pagamentos = new java.util.ArrayList<>();
 }
