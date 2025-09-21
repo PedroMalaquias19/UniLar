@@ -4,6 +4,7 @@ import com.pedro.UniLar.condominio.condominio.Condominio;
 import com.pedro.UniLar.condominio.condominio.CondominioService;
 import com.pedro.UniLar.condominio.mandato.dto.MandatoRequest;
 import com.pedro.UniLar.condominio.mandato.dto.MandatoResponse;
+import com.pedro.UniLar.condominio.mandato.dto.MandatoComCondominioResponse;
 import com.pedro.UniLar.condominio.mandato.enums.StatusContrato;
 import com.pedro.UniLar.exception.BadRequestException;
 import com.pedro.UniLar.exception.NotAllowedException;
@@ -58,6 +59,16 @@ public class MandatoService {
     public List<MandatoResponse> listarPorCondominio(Long condominioId) {
         Condominio condominio = condominioService.getEntity(condominioId);
         return condominio.getMandatos().stream().map(mapper::toResponse).toList();
+    }
+
+    public List<MandatoComCondominioResponse> listarPorSindico(Long sindicoId) {
+        // Verifica se o síndico existe para retornar 404 quando apropriado
+        sindicoRepository.findById(sindicoId)
+                .orElseThrow(() -> new NotFoundException("Síndico não encontrado: " + sindicoId));
+        return repository.findAllBySindicoIdWithCondominio(sindicoId)
+                .stream()
+                .map(mapper::toResponseComCondominio)
+                .toList();
     }
 
     @Transactional
