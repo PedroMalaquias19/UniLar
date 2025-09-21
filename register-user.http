@@ -86,9 +86,9 @@ Authorization: Bearer {{admin-token}}
 {
   "nome": "Enzo",
   "sobrenome": "Dos Santos",
-  "email": "dsantos@unilar.co.ao",
+  "email": "dsanttos@unilar.co.ao",
   "password": "DSantos",
-  "NIF": "COND98765f122",
+  "NIF": "COND987765f122",
   "telefone": "922222222",
   "tipo": "DEPENDENTE"
 }
