@@ -34,6 +34,9 @@ public class MoradiaService {
     private final BlocoService blocoService;
     private final MandatoRepository mandatoRepository;
     private final CondominoRepository condominoRepository;
+    private final com.pedro.UniLar.condominio.moradia.contrato.ContratoPropriedadeRepository contratoRepository;
+    private final com.pedro.UniLar.condominio.moradia.contrato.ContratoPropriedadeMapper contratoMapper;
+    private final com.pedro.UniLar.profile.user.mapper.CondominoMapper condominoMapper;
     private final ContratoPropriedadeRepository contratoPropriedadeRepository;
     private final ContratoPropriedadeMapper contratoPropriedadeMapper;
 
@@ -237,5 +240,23 @@ public class MoradiaService {
     public Moradia getEntity(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Moradia não encontrada: " + id));
+    }
+
+    public com.pedro.UniLar.condominio.moradia.dto.MoradiaDetalheResponse detalhes(Long condominioId, Long id) {
+        Moradia m = getEntity(id);
+        if (!m.getBloco().getCondominio().getIdCondominio().equals(condominioId)) {
+            throw new NotFoundException("Moradia não pertence ao condomínio informado");
+        }
+        var moradiaResp = mapper.toResponse(m);
+        var contratoAtivo = contratoRepository.findAtivoByMoradia(m.getIdMoradia()).map(contratoMapper::toResponse)
+                .orElse(null);
+        var proprietario = contratoRepository.findAtivoByMoradia(m.getIdMoradia())
+                .map(c -> condominoMapper.toResponse(c.getProprietario()))
+                .orElse(null);
+        var dependentes = condominoRepository.findByMoradiaAndTipos(m.getIdMoradia(),
+                java.util.List.of(TipoCondomino.DEPENDENTE, TipoCondomino.FUNCIONARIO, TipoCondomino.OUTRO));
+        var dependentesResp = condominoMapper.toResponseList(dependentes);
+        return new com.pedro.UniLar.condominio.moradia.dto.MoradiaDetalheResponse(moradiaResp, contratoAtivo,
+                proprietario, dependentesResp);
     }
 }

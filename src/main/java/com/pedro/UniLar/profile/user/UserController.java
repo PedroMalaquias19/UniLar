@@ -78,6 +78,12 @@ public class UserController {
         return userService.downloadUserProfileImage(id);
     }
 
+    @GetMapping("{id}/contratos")
+    public ResponseEntity<com.pedro.UniLar.profile.user.dto.UserContratosResponse> getUserContratos(
+            @PathVariable Long id) {
+        return ResponseEntity.ok(userService.detalhesContratos(id));
+    }
+
     @Builder
     public record ChangePasswordRequest(String currentPassword, String newPassword, String confirmPassword) {
     }

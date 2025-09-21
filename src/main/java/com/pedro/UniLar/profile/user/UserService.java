@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.security.Principal;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +26,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final FileService fileService;
+    private final com.pedro.UniLar.condominio.moradia.contrato.ContratoPropriedadeRepository contratoRepository;
+    private final com.pedro.UniLar.condominio.moradia.contrato.ContratoPropriedadeMapper contratoMapper;
+    private final com.pedro.UniLar.condominio.moradia.MoradiaMapper moradiaMapper;
 
     public User saveUser(User user) {
         try {
@@ -105,5 +109,22 @@ public class UserService {
     public byte[] downloadUserProfileImage(Long id) {
         User user = findById(id);
         return fileService.download(user.getFotografia().orElse(null));
+    }
+
+    public com.pedro.UniLar.profile.user.dto.UserContratosResponse detalhesContratos(Long userId) {
+        User u = findById(userId);
+        var usuario = new com.pedro.UniLar.profile.user.dto.UserResponse(
+                u.getIdUsuario(), u.getNome(), u.getSobrenome(), u.getEmail(), u.getTelefone(), u.getNIF(),
+                u.isEnabled(), u.isAccountNonLocked(), u.getRole(), u.getFotografia().orElse(null));
+
+        var contratos = contratoRepository.findAll().stream()
+                .filter(c -> c.getProprietario() != null && c.getProprietario().getIdUsuario().equals(userId))
+                .collect(Collectors.toList());
+
+        var itens = contratos.stream()
+                .map(c -> new com.pedro.UniLar.profile.user.dto.UserContratosResponse.ItemMoradiaContrato(
+                        moradiaMapper.toResponse(c.getMoradia()), contratoMapper.toResponse(c)))
+                .toList();
+        return new com.pedro.UniLar.profile.user.dto.UserContratosResponse(usuario, itens);
     }
 }
